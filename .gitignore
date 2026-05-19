@@ -1,6 +1,8 @@
 .env
+CLAUDE.md
 __pycache__/
 *.pyc
 .venv/
 results/
 *.json.bak
+trace.log

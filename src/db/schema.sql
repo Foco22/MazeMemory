@@ -1,0 +1,52 @@
+-- Run this once in the Supabase SQL editor to create all tables.
+
+CREATE TABLE experiments (
+    id                      UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    scenario                TEXT        NOT NULL,
+    maze_id                 INTEGER     NOT NULL,
+    maze_seed               INTEGER     NOT NULL,
+    provider                TEXT        NOT NULL,
+    model                   TEXT        NOT NULL,
+    model_version           TEXT        NOT NULL,
+    run_number              INTEGER     NOT NULL,
+    lookahead               INTEGER     NOT NULL,
+    started_at              TIMESTAMPTZ NOT NULL,
+    completed_at            TIMESTAMPTZ NOT NULL,
+    total_prompt_tokens     INTEGER     NOT NULL,
+    total_completion_tokens INTEGER     NOT NULL,
+    total_tokens            INTEGER     NOT NULL,
+    observer_prompt_tokens     INTEGER,
+    observer_completion_tokens INTEGER
+);
+
+CREATE TABLE agent_runs (
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    experiment_id   UUID    NOT NULL REFERENCES experiments(id) ON DELETE CASCADE,
+    agent_id        TEXT    NOT NULL,
+    steps           INTEGER NOT NULL,
+    prompt_tokens   INTEGER NOT NULL,
+    completion_tokens INTEGER NOT NULL,
+    total_tokens    INTEGER NOT NULL,
+    reached_exit    BOOLEAN NOT NULL
+);
+
+CREATE TABLE trajectories (
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    experiment_id   UUID    NOT NULL REFERENCES experiments(id) ON DELETE CASCADE,
+    agent_id        TEXT    NOT NULL,
+    x               INTEGER NOT NULL,
+    y               INTEGER NOT NULL,
+    timestep        INTEGER NOT NULL
+);
+
+-- One row per tool call — captures every decision the agent made
+CREATE TABLE agent_actions (
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    experiment_id   UUID    NOT NULL REFERENCES experiments(id) ON DELETE CASCADE,
+    agent_id        TEXT    NOT NULL,
+    step            INTEGER NOT NULL,   -- sequential action number within the agent's run
+    llm_text        TEXT,               -- LLM reasoning text before the tool call (may be null)
+    tool_name       TEXT    NOT NULL,
+    tool_args       JSONB,
+    tool_result     JSONB   NOT NULL
+);

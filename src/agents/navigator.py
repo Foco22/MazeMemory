@@ -1,0 +1,179 @@
+import os
+import sys
+import json
+import litellm
+from src.maze.generator import Maze
+from src.maze.pathfinding import optimal_steps
+from src.memory.shared import SharedMemoryStore
+from src.agents.tools import build_tools, build_insight_tool
+from src.agents.prompts import navigator_system_prompt
+from src.agents.context import compress_messages, print_messages
+
+MAX_STEPS = 500  # safety limit to prevent infinite loops
+
+DIRECTIONS = {
+    "north": (0, -1),
+    "south": (0, 1),
+    "east":  (1, 0),
+    "west":  (-1, 0),
+}
+
+
+class NavigatorAgent:
+    def __init__(
+        self,
+        agent_id: str,
+        agent_index: int,
+        maze: Maze,
+        model: str,
+        lookahead: int = 3,
+        shared_memory: SharedMemoryStore | None = None,
+        observer=None,
+        on_move=None,
+    ):
+        self.agent_id = agent_id
+        self.maze = maze
+        self.model = model
+        self.lookahead = lookahead
+        self.shared_memory = shared_memory
+        self.observer = observer
+        self.on_move = on_move
+
+        self.position = maze.start_positions[agent_index]
+        self.path: list[tuple[int, int]] = [self.position]
+        self.timestep = 0
+        self.prompt_tokens = 0
+        self.completion_tokens = 0
+        self.trace: list[dict] = []
+        self._action_step = 0
+        self._context_messages = 0
+        self._llm_turns = 0
+
+    async def run(self) -> dict:
+        messages = [
+            {
+                "role": "system",
+                "content": navigator_system_prompt(self.agent_id, self.lookahead, has_observer=self.observer is not None),
+            },
+            {"role": "user", "content": "Start navigating. Find the exit."},
+        ]
+        tools = build_tools(self.lookahead)
+        if self.observer:
+            tools.append(build_insight_tool())
+
+        while self.position != self.maze.exit_pos and len(self.path) <= MAX_STEPS:
+            compressed = compress_messages(messages)
+            response = await litellm.acompletion(
+                model=self.model,
+                messages=compressed,
+                tools=tools,
+            )
+            actual = response.usage.prompt_tokens
+            print(f"[A{self.agent_id}] turn={self._llm_turns+1}  msgs_full={len(messages)}  msgs_compressed={len(compressed)}  tokens={actual}")
+            print_messages(compressed, label=f"A{self.agent_id} turn {self._llm_turns+1}")
+
+            self.prompt_tokens += response.usage.prompt_tokens
+            self.completion_tokens += response.usage.completion_tokens
+            self._context_messages = len(messages)
+            self._llm_turns += 1
+
+            if self._llm_turns == 10:
+                with open("trace.log", "a") as f:
+                    f.write(f"\n{'='*60}\n")
+                    f.write(f"[A{self.agent_id}] FULL MESSAGES AT TURN 10 ({len(messages)} msgs)\n")
+                    f.write(f"{'='*60}\n")
+                    for i, msg in enumerate(messages):
+                        f.write(f"  [{i}] {msg}\n")
+                    f.write(f"{'='*60}\n")
+
+            message = response.choices[0].message
+            messages.append(message)
+
+            if not message.tool_calls:
+                break
+
+            llm_text = message.content or None
+            tool_results = []
+            for tool_call in message.tool_calls:
+                args = json.loads(tool_call.function.arguments or "{}")
+                result = await self._execute(tool_call)
+                self.trace.append({
+                    "step":        self._action_step,
+                    "llm_text":    llm_text,
+                    "tool_name":   tool_call.function.name,
+                    "tool_args":   args,
+                    "tool_result": result,
+                })
+                self._action_step += 1
+                llm_text = None  # only attach reasoning to the first tool call per LLM turn
+                tool_results.append({
+                    "role": "tool",
+                    "tool_call_id": tool_call.id,
+                    "content": json.dumps(result),
+                })
+            messages.extend(tool_results)
+
+        return {
+            "agent_id": self.agent_id,
+            "path": self.path,
+            "steps": len(self.path) - 1,
+            "prompt_tokens": self.prompt_tokens,
+            "completion_tokens": self.completion_tokens,
+            "total_tokens": self.prompt_tokens + self.completion_tokens,
+            "reached_exit": self.position == self.maze.exit_pos,
+            "trace": self.trace,
+        }
+
+    async def _execute(self, tool_call) -> dict:
+        name = tool_call.function.name
+        args = json.loads(tool_call.function.arguments or "{}")
+
+        if name == "get_location":
+            result = {"x": self.position[0], "y": self.position[1]}
+        elif name == "get_distance_to_exit":
+            result = {"steps": optimal_steps(self.maze, self.position, self.maze.exit_pos)}
+        elif name == "get_surroundings":
+            result = self._surroundings()
+        elif name == "move":
+            result = await self._move(args["direction"])
+        elif name == "get_insight" and self.observer:
+            recommendation = await self.observer.get_insight(self.agent_id, self.position)
+            result = {"recommendation": recommendation}
+        else:
+            result = {"error": f"unknown tool: {name}"}
+
+        _trace_filter = os.environ.get("TRACE_AGENT", "")
+        if not _trace_filter or _trace_filter == self.agent_id:
+            with open("trace.log", "a") as f:
+                print(f"[A{self.agent_id}] {name}({args}) → {result}", file=f, flush=True)
+        return result
+
+    def _surroundings(self) -> dict:
+        x, y = self.position
+        result = {}
+        for direction, (dx, dy) in DIRECTIONS.items():
+            count = 0
+            for i in range(1, self.lookahead + 1):
+                if self.maze.is_open(x + dx * i, y + dy * i):
+                    count += 1
+                else:
+                    break
+            result[direction] = count
+        return result
+
+    async def _move(self, direction: str) -> dict:
+        dx, dy = DIRECTIONS[direction]
+        x, y = self.position
+        nx, ny = x + dx, y + dy
+
+        if self.maze.is_open(nx, ny):
+            self.position = (nx, ny)
+            self.timestep += 1
+            self.path.append(self.position)
+            if self.shared_memory:
+                await self.shared_memory.record(self.agent_id, nx, ny, self.timestep)
+            if self.on_move:
+                await self.on_move(self.agent_id, self.position, self.timestep, self.prompt_tokens, self.completion_tokens, self._context_messages)
+            return {"success": True, "position": {"x": nx, "y": ny}}
+
+        return {"success": False, "position": {"x": x, "y": y}, "reason": "wall"}

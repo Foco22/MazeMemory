@@ -62,6 +62,7 @@ class NavigatorAgent:
         if self.observer:
             tools.append(build_insight_tool())
 
+        agent_started_at = datetime.now()
         while self.position != self.maze.exit_pos and len(self.path) <= MAX_STEPS:
             compressed = compress_messages(messages)
             response = await litellm.acompletion(
@@ -122,6 +123,8 @@ class NavigatorAgent:
                 })
             messages.extend(tool_results)
 
+        duration = (datetime.now() - agent_started_at).total_seconds()
+
         return {
             "agent_id": self.agent_id,
             "path": self.path,
@@ -130,6 +133,7 @@ class NavigatorAgent:
             "completion_tokens": self.completion_tokens,
             "total_tokens": self.prompt_tokens + self.completion_tokens,
             "reached_exit": self.position == self.maze.exit_pos,
+            "duration_seconds": round(duration, 3),
             "trace": self.trace,
         }
 

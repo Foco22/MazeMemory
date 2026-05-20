@@ -84,7 +84,6 @@ async def run_experiments(
     print(f"\nDone. {completed - failed}/{total} succeeded, {failed} failed.")
     if failed:
         print("Check results/ folder for locally saved runs.")
-    await asyncio.sleep(0.25)  # allow SSL connections to drain before loop closes
 
 
 def parse_args():
@@ -101,6 +100,13 @@ def parse_args():
     return parser.parse_args()
 
 
+def _silence_ssl_shutdown(loop, context):
+    msg = context.get("message", "")
+    if "SSL" in msg or "Fatal" in msg:
+        return
+    loop.default_exception_handler(context)
+
+
 if __name__ == "__main__":
     args = parse_args()
     model_config = ModelConfig(
@@ -108,12 +114,18 @@ if __name__ == "__main__":
         model=args.model,
         version=args.version or args.model,
     )
-    asyncio.run(run_experiments(
-        model_config=model_config,
-        scenarios=args.scenarios,
-        maze_ids=args.mazes,
-        n_runs=args.n_runs,
-        lookahead=args.lookahead,
-        save_to_db=not args.no_db,
-        live=args.live,
-    ))
+    loop = asyncio.new_event_loop()
+    loop.set_exception_handler(_silence_ssl_shutdown)
+    asyncio.set_event_loop(loop)
+    try:
+        loop.run_until_complete(run_experiments(
+            model_config=model_config,
+            scenarios=args.scenarios,
+            maze_ids=args.mazes,
+            n_runs=args.n_runs,
+            lookahead=args.lookahead,
+            save_to_db=not args.no_db,
+            live=args.live,
+        ))
+    finally:
+        loop.close()

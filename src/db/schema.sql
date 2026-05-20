@@ -21,7 +21,8 @@ CREATE TABLE experiments (
     cost_completion_usd        NUMERIC(12, 6),
     cost_agents_usd            NUMERIC(12, 6),
     cost_observer_usd          NUMERIC(12, 6),
-    cost_total_usd             NUMERIC(12, 6)
+    cost_total_usd             NUMERIC(12, 6),
+    duration_seconds           NUMERIC(10, 3)
 );
 
 CREATE TABLE agent_runs (
@@ -32,7 +33,8 @@ CREATE TABLE agent_runs (
     prompt_tokens   INTEGER NOT NULL,
     completion_tokens INTEGER NOT NULL,
     total_tokens    INTEGER NOT NULL,
-    reached_exit    BOOLEAN NOT NULL
+    reached_exit      BOOLEAN NOT NULL,
+    duration_seconds  NUMERIC(10, 3)
 );
 
 CREATE TABLE trajectories (

@@ -1,4 +1,5 @@
 import os
+from datetime import datetime, timezone
 from supabase._async.client import AsyncClient, create_client
 from dotenv import load_dotenv
 from src.metrics.calculator import TokenConsumption
@@ -44,6 +45,10 @@ class SupabaseClient:
 
         cost_total = round(cost_agents + (cost_observer or 0), 6)
 
+        started  = datetime.fromisoformat(result["started_at"])
+        completed = datetime.fromisoformat(result["completed_at"])
+        exp_duration = round((completed - started).total_seconds(), 3)
+
         exp_row = {
             "scenario":                   result["scenario"],
             "maze_id":                    maze_id,
@@ -65,6 +70,7 @@ class SupabaseClient:
             "cost_agents_usd":            cost_agents,
             "cost_observer_usd":          cost_observer,
             "cost_total_usd":             cost_total,
+            "duration_seconds":           exp_duration,
         }
 
         exp_response = await self._client.table("experiments").insert(exp_row).execute()
@@ -79,6 +85,7 @@ class SupabaseClient:
                 "completion_tokens": a["completion_tokens"],
                 "total_tokens":     a["total_tokens"],
                 "reached_exit":     a["reached_exit"],
+                "duration_seconds": a.get("duration_seconds"),
             }
             for a in result["agents"]
         ]

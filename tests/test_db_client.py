@@ -27,6 +27,7 @@ def make_result():
                 "completion_tokens": 50,
                 "total_tokens": 150,
                 "reached_exit": False,
+                "duration_seconds": 5.0 + i,
             }
             for i in range(3)
         ],
@@ -83,6 +84,27 @@ async def test_save_run_inserts_three_tables():
     assert "experiments" in table_calls
     assert "agent_runs" in table_calls
     assert "trajectories" in table_calls
+
+
+@pytest.mark.asyncio
+async def test_save_run_experiment_duration():
+    client = make_client()
+    await client.save_run(make_result(), maze_id=1)
+
+    row = client._client.table.return_value.insert.call_args_list[0][0][0]
+    # started=00:00:00, completed=00:01:00 → 60 seconds
+    assert row["duration_seconds"] == pytest.approx(60.0, rel=1e-3)
+
+
+@pytest.mark.asyncio
+async def test_save_run_agent_duration():
+    client = make_client()
+    await client.save_run(make_result(), maze_id=1)
+
+    agent_rows = client._client.table.return_value.insert.call_args_list[1][0][0]
+    assert agent_rows[0]["duration_seconds"] == 5.0
+    assert agent_rows[1]["duration_seconds"] == 6.0
+    assert agent_rows[2]["duration_seconds"] == 7.0
 
 
 @pytest.mark.asyncio

@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+from datetime import datetime
 import litellm
 from src.maze.generator import Maze
 from src.maze.pathfinding import optimal_steps
@@ -68,23 +69,25 @@ class NavigatorAgent:
                 messages=compressed,
                 tools=tools,
             )
-            actual = response.usage.prompt_tokens
-            print(f"[A{self.agent_id}] turn={self._llm_turns+1}  msgs_full={len(messages)}  msgs_compressed={len(compressed)}  tokens={actual}")
-            print_messages(compressed, label=f"A{self.agent_id} turn {self._llm_turns+1}")
-
             self.prompt_tokens += response.usage.prompt_tokens
             self.completion_tokens += response.usage.completion_tokens
             self._context_messages = len(messages)
             self._llm_turns += 1
 
-            if self._llm_turns == 10:
-                with open("trace.log", "a") as f:
-                    f.write(f"\n{'='*60}\n")
-                    f.write(f"[A{self.agent_id}] FULL MESSAGES AT TURN 10 ({len(messages)} msgs)\n")
-                    f.write(f"{'='*60}\n")
-                    for i, msg in enumerate(messages):
-                        f.write(f"  [{i}] {msg}\n")
-                    f.write(f"{'='*60}\n")
+            # debug: uncomment to see token counts and compressed messages
+            # actual = response.usage.prompt_tokens
+            # print(f"[A{self.agent_id}] turn={self._llm_turns}  msgs_full={len(messages)}  msgs_compressed={len(compressed)}  tokens={actual}")
+            # print_messages(compressed, label=f"A{self.agent_id} turn {self._llm_turns}")
+
+            # debug: uncomment to dump full message history at turn 10
+            # if self._llm_turns == 10:
+            #     with open("trace.log", "a") as f:
+            #         f.write(f"\n{'='*60}\n")
+            #         f.write(f"[A{self.agent_id}] FULL MESSAGES AT TURN 10 ({len(messages)} msgs)\n")
+            #         f.write(f"{'='*60}\n")
+            #         for i, msg in enumerate(messages):
+            #             f.write(f"  [{i}] {msg}\n")
+            #         f.write(f"{'='*60}\n")
 
             message = response.choices[0].message
             messages.append(message)
@@ -145,7 +148,8 @@ class NavigatorAgent:
         _trace_filter = os.environ.get("TRACE_AGENT", "")
         if not _trace_filter or _trace_filter == self.agent_id:
             with open("trace.log", "a") as f:
-                print(f"[A{self.agent_id}] {name}({args}) → {result}", file=f, flush=True)
+                ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+                print(f"[{ts}] [A{self.agent_id}] {name}({args}) → {result}", file=f, flush=True)
         return result
 
     def _surroundings(self) -> dict:

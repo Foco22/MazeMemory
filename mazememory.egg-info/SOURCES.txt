@@ -1,3 +1,4 @@
+README.md
 pyproject.toml
 mazememory.egg-info/PKG-INFO
 mazememory.egg-info/SOURCES.txt
@@ -5,6 +6,7 @@ mazememory.egg-info/dependency_links.txt
 mazememory.egg-info/top_level.txt
 src/__init__.py
 src/agents/__init__.py
+src/agents/context.py
 src/agents/navigator.py
 src/agents/observer.py
 src/agents/prompts.py
@@ -22,6 +24,8 @@ src/metrics/calculator.py
 src/scenarios/__init__.py
 src/scenarios/config.py
 src/scenarios/runner.py
+src/viz/__init__.py
+src/viz/terminal.py
 tests/test_db_client.py
 tests/test_maze.py
 tests/test_metrics.py

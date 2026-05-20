@@ -23,9 +23,27 @@ python experiments/run.py
 # Single test run with live visualization
 python experiments/run.py --scenarios baseline --mazes 1 --n-runs 1 --model gpt-4o --provider openai --live --no-db
 
+# Cheapest option (DeepSeek)
+python experiments/run.py --scenarios baseline --mazes 1 --n-runs 1 --model deepseek/deepseek-chat --provider deepseek --live --no-db
+
 # All options
 python experiments/run.py --help
 ```
+
+Supported models (pass as `--model`):
+
+| Model | Provider | Input $/1M | Output $/1M |
+|---|---|---|---|
+| `claude-sonnet-4-6` | `anthropic` | $3.00 | $15.00 |
+| `claude-haiku-4-5-20251001` | `anthropic` | $0.80 | $4.00 |
+| `gpt-4o` | `openai` | $2.50 | $10.00 |
+| `gpt-4o-mini` | `openai` | $0.15 | $0.60 |
+| `gpt-5.5` | `openai` | $5.00 | $30.00 |
+| `gemini/gemini-2.0-flash` | `gemini` | $0.075 | $0.30 |
+| `deepseek/deepseek-chat` | `deepseek` | $0.14 | $0.28 |
+| `deepseek/deepseek-v3` | `deepseek` | $0.14 | $0.28 |
+| `deepseek/deepseek-v3.2` | `deepseek` | $0.14 | $0.28 |
+| `deepseek/deepseek-reasoner` | `deepseek` | $0.435 | $0.87 |
 
 Key flags:
 

@@ -63,6 +63,9 @@ async def run_experiments(
                     )
                     result["maze_id"] = maze_id
 
+                    if live:
+                        view.show_summary(result)
+
                     # Local JSON backup — always saved regardless of DB
                     ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S")
                     fname = f"{scenario}_maze{maze_id}_run{run_number:02d}_{ts}.json"
@@ -81,6 +84,7 @@ async def run_experiments(
     print(f"\nDone. {completed - failed}/{total} succeeded, {failed} failed.")
     if failed:
         print("Check results/ folder for locally saved runs.")
+    await asyncio.sleep(0.25)  # allow SSL connections to drain before loop closes
 
 
 def parse_args():

@@ -4,15 +4,16 @@ import json
 import sys
 from pathlib import Path
 from src.maze.generator import Maze
+from src.metrics.calculator import PathOptimalityRatio, TokenConsumption
 
 _PRICES_PATH = Path(__file__).parent.parent / "metrics" / "prices.json"
 with _PRICES_PATH.open() as _f:
     _PRICES: dict[str, dict] = json.load(_f)
 
 COLORS = {
-    "1": "\033[92m",   # green
-    "2": "\033[94m",   # blue
-    "3": "\033[93m",   # yellow
+    "1": "\033[93m",   # yellow
+    "2": "\033[38;5;214m",  # orange
+    "3": "\033[92m",   # green
 }
 RESET  = "\033[0m"
 RED    = "\033[91m"
@@ -101,3 +102,35 @@ class LiveMazeView:
         print(CLR)
         total_cost = _cost(self.model, total_prompt, total_completion)
         print(f"  {BOLD}TOTAL{RESET}  prompt={total_prompt}  completion={total_completion}  cost=${total_cost:.5f}{CLR}")
+
+    def show_summary(self, result: dict) -> None:
+        _exit_alt_screen()
+        atexit.unregister(_exit_alt_screen)
+
+        optimality = PathOptimalityRatio(self.maze).compute_all(result)
+        tokens = TokenConsumption().compute(result)
+
+        opt_by_id = {r["agent_id"]: r for r in optimality}
+
+        print("\n" + "─" * 52)
+        print(f"  {BOLD}RUN SUMMARY{RESET}  {result['scenario']}  maze={result['maze_id']}")
+        print("─" * 52)
+        print(f"  {'Agent':<8} {'Steps':>6} {'Optimal':>8} {'Ratio':>7} {'Tokens':>8} {'Cost':>10}")
+        print("  " + "·" * 55)
+
+        for ag in result["agents"]:
+            aid = ag["agent_id"]
+            color = COLORS.get(aid, "")
+            opt = opt_by_id[aid]
+            ratio = f"{opt['ratio']:.2f}" if opt["ratio"] is not None else "N/A"
+            agent_cost = _cost(result["model"], ag["prompt_tokens"], ag["completion_tokens"])
+            print(f"  {color}Agent {aid}{RESET}   "
+                  f"{ag['steps']:>6}  "
+                  f"{opt['optimal_steps'] or 'N/A':>7}  "
+                  f"{ratio:>7}  "
+                  f"{ag['total_tokens']:>7}  "
+                  f"${agent_cost:.5f}")
+
+        print("  " + "·" * 55)
+        print(f"  {'TOTAL':<8} {'':>6} {'':>8} {'':>7} {tokens['total_tokens']:>8}  ${tokens['estimated_cost_usd']:.5f}")
+        print("─" * 52 + "\n")

@@ -96,19 +96,25 @@ class NavigatorAgent:
                 break
 
             llm_text = message.content or None
+            turn_prompt     = response.usage.prompt_tokens
+            turn_completion = response.usage.completion_tokens
             tool_results = []
             for tool_call in message.tool_calls:
                 args = json.loads(tool_call.function.arguments or "{}")
                 result = await self._execute(tool_call)
                 self.trace.append({
-                    "step":        self._action_step,
-                    "llm_text":    llm_text,
-                    "tool_name":   tool_call.function.name,
-                    "tool_args":   args,
-                    "tool_result": result,
+                    "step":             self._action_step,
+                    "llm_text":         llm_text,
+                    "tool_name":        tool_call.function.name,
+                    "tool_args":        args,
+                    "tool_result":      result,
+                    "prompt_tokens":    turn_prompt,
+                    "completion_tokens": turn_completion,
                 })
                 self._action_step += 1
-                llm_text = None  # only attach reasoning to the first tool call per LLM turn
+                llm_text        = None   # only on first tool call per LLM turn
+                turn_prompt     = None   # only on first tool call per LLM turn
+                turn_completion = None
                 tool_results.append({
                     "role": "tool",
                     "tool_call_id": tool_call.id,

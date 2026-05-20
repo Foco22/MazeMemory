@@ -99,13 +99,15 @@ class SupabaseClient:
 
         action_rows = [
             {
-                "experiment_id": experiment_id,
-                "agent_id":      a["agent_id"],
-                "step":          action["step"],
-                "llm_text":      action["llm_text"],
-                "tool_name":     action["tool_name"],
-                "tool_args":     action["tool_args"],
-                "tool_result":   action["tool_result"],
+                "experiment_id":    experiment_id,
+                "agent_id":         a["agent_id"],
+                "step":             action["step"],
+                "llm_text":         action["llm_text"],
+                "tool_name":        action["tool_name"],
+                "tool_args":        action["tool_args"],
+                "tool_result":      action["tool_result"],
+                "prompt_tokens":    action.get("prompt_tokens"),
+                "completion_tokens": action.get("completion_tokens"),
             }
             for a in result["agents"]
             for action in a.get("trace", [])

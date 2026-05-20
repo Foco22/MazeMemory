@@ -46,12 +46,14 @@ CREATE TABLE trajectories (
 
 -- One row per tool call — captures every decision the agent made
 CREATE TABLE agent_actions (
-    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    experiment_id   UUID    NOT NULL REFERENCES experiments(id) ON DELETE CASCADE,
-    agent_id        TEXT    NOT NULL,
-    step            INTEGER NOT NULL,   -- sequential action number within the agent's run
-    llm_text        TEXT,               -- LLM reasoning text before the tool call (may be null)
-    tool_name       TEXT    NOT NULL,
-    tool_args       JSONB,
-    tool_result     JSONB   NOT NULL
+    id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    experiment_id    UUID    NOT NULL REFERENCES experiments(id) ON DELETE CASCADE,
+    agent_id         TEXT    NOT NULL,
+    step             INTEGER NOT NULL,   -- sequential action number within the agent's run
+    llm_text         TEXT,               -- LLM reasoning text before the tool call (may be null)
+    tool_name        TEXT    NOT NULL,
+    tool_args        JSONB,
+    tool_result      JSONB   NOT NULL,
+    prompt_tokens    INTEGER,            -- tokens used in this LLM call (null for non-first tool calls in same turn)
+    completion_tokens INTEGER           -- tokens generated in this LLM call (null for non-first tool calls in same turn)
 );

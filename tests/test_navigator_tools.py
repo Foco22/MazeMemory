@@ -62,6 +62,37 @@ async def test_move_into_wall():
     assert len(agent.path) == 1
 
 
+def test_trace_entry_has_token_fields():
+    agent = make_agent()
+    agent.trace.append({
+        "step": 0,
+        "llm_text": "thinking",
+        "tool_name": "get_location",
+        "tool_args": {},
+        "tool_result": {"x": 1, "y": 1},
+        "prompt_tokens": 100,
+        "completion_tokens": 20,
+    })
+    entry = agent.trace[0]
+    assert entry["prompt_tokens"] == 100
+    assert entry["completion_tokens"] == 20
+
+
+def test_trace_subsequent_tool_calls_have_none_tokens():
+    agent = make_agent()
+    # Simulate two tool calls in the same LLM turn
+    agent.trace.append({
+        "step": 0, "llm_text": "thinking", "tool_name": "get_location",
+        "tool_args": {}, "tool_result": {}, "prompt_tokens": 150, "completion_tokens": 30,
+    })
+    agent.trace.append({
+        "step": 1, "llm_text": None, "tool_name": "move",
+        "tool_args": {"direction": "south"}, "tool_result": {}, "prompt_tokens": None, "completion_tokens": None,
+    })
+    assert agent.trace[0]["prompt_tokens"] == 150
+    assert agent.trace[1]["prompt_tokens"] is None
+
+
 @pytest.mark.asyncio
 async def test_move_writes_to_shared_memory():
     from src.memory.shared import SharedMemoryStore

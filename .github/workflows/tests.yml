@@ -13,4 +13,4 @@ jobs:
         with:
           python-version: "3.10"
       - run: pip install -e .
-      - run: pytest --tb=short -q
+      - run: python -m pytest --tb=short -q

@@ -3,6 +3,7 @@ pyproject.toml
 mazememory.egg-info/PKG-INFO
 mazememory.egg-info/SOURCES.txt
 mazememory.egg-info/dependency_links.txt
+mazememory.egg-info/requires.txt
 mazememory.egg-info/top_level.txt
 src/__init__.py
 src/agents/__init__.py
@@ -32,3 +33,4 @@ tests/test_metrics.py
 tests/test_navigator_tools.py
 tests/test_runner.py
 tests/test_shared_memory.py
+tests/test_terminal.py

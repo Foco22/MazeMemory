@@ -1,3 +1,4 @@
+import json
 import pytest
 import asyncio
 from src.memory.shared import SharedMemoryStore
@@ -20,6 +21,35 @@ async def test_empty_store():
     store = SharedMemoryStore()
     data = await store.get_all()
     assert data == {}
+
+
+@pytest.mark.asyncio
+async def test_log_file_written_on_record(tmp_path):
+    log = tmp_path / "sm.jsonl"
+    store = SharedMemoryStore(log_path=log)
+    await store.record("1", 2, 3, 0)
+    await store.record("2", 5, 7, 1)
+
+    lines = log.read_text().strip().split("\n")
+    assert len(lines) == 2
+    assert json.loads(lines[0]) == {"agent_id": "1", "x": 2, "y": 3, "t": 0}
+    assert json.loads(lines[1]) == {"agent_id": "2", "x": 5, "y": 7, "t": 1}
+
+
+@pytest.mark.asyncio
+async def test_log_file_appends_incrementally(tmp_path):
+    log = tmp_path / "sm.jsonl"
+    store = SharedMemoryStore(log_path=log)
+    await store.record("1", 1, 1, 0)
+    assert log.read_text().count("\n") == 1
+    await store.record("1", 1, 2, 1)
+    assert log.read_text().count("\n") == 2
+
+
+@pytest.mark.asyncio
+async def test_no_log_file_when_path_is_none():
+    store = SharedMemoryStore(log_path=None)
+    await store.record("1", 1, 1, 0)  # should not raise
 
 
 @pytest.mark.asyncio

@@ -6,7 +6,7 @@ import litellm
 from src.maze.generator import Maze
 from src.maze.pathfinding import optimal_steps
 from src.memory.shared import SharedMemoryStore
-from src.agents.tools import build_tools, build_insight_tool
+from src.agents.tools import build_tools, build_shared_memory_tool, build_insight_tool
 from src.agents.prompts import navigator_system_prompt
 from src.agents.context import compress_messages, print_messages
 
@@ -54,11 +54,18 @@ class NavigatorAgent:
         messages = [
             {
                 "role": "system",
-                "content": navigator_system_prompt(self.agent_id, self.lookahead, has_observer=self.observer is not None),
+                "content": navigator_system_prompt(
+                    self.agent_id,
+                    self.lookahead,
+                    has_shared_memory=self.shared_memory is not None,
+                    has_observer=self.observer is not None,
+                ),
             },
             {"role": "user", "content": "Start navigating. Find the exit."},
         ]
         tools = build_tools(self.lookahead)
+        if self.shared_memory:
+            tools.append(build_shared_memory_tool())
         if self.observer:
             tools.append(build_insight_tool())
 
@@ -149,6 +156,16 @@ class NavigatorAgent:
             result = self._surroundings()
         elif name == "move":
             result = await self._move(args["direction"])
+        elif name == "get_shared_memory" and self.shared_memory:
+            all_data = await self.shared_memory.get_all()
+            result = {
+                f"agent_{aid}": {
+                    "current": {"x": positions[-1][0], "y": positions[-1][1]},
+                    "visited": [{"x": x, "y": y} for x, y, _ in positions],
+                }
+                for aid, positions in all_data.items()
+                if aid != self.agent_id and positions
+            }
         elif name == "get_insight" and self.observer:
             recommendation = await self.observer.get_insight(self.agent_id, self.position)
             result = {"recommendation": recommendation}

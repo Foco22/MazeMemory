@@ -14,7 +14,7 @@ from pathlib import Path
 
 from src.db.client import SupabaseClient
 
-RESULTS_DIR = Path("results")
+RESULTS_DIR = Path("results/experiments")
 
 
 async def sync(results_dir: Path, dry_run: bool = False) -> None:

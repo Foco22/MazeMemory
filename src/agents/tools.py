@@ -1,3 +1,17 @@
+def build_shared_memory_tool() -> dict:
+    return {
+        "type": "function",
+        "function": {
+            "name": "get_shared_memory",
+            "description": (
+                "Returns the positions already visited by each teammate and their current position. "
+                "Use this to avoid exploring cells already covered by other agents and to coordinate routes."
+            ),
+            "parameters": {"type": "object", "properties": {}, "required": []},
+        },
+    }
+
+
 def build_insight_tool() -> dict:
     return {
         "type": "function",

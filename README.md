@@ -57,6 +57,28 @@ Key flags:
 | `--live` | Show real-time maze visualization |
 | `--no-db` | Skip Supabase, save results locally to `results/` |
 
+## Saving results to Supabase
+
+Runs are always saved locally before any DB write:
+
+```
+results/
+  experiments/     ← one JSON per run (source of truth for sync)
+  shared_memory/   ← one JSONL per run, written incrementally during execution
+```
+
+To upload to Supabase:
+
+```bash
+# Preview what would be uploaded (no writes)
+python experiments/sync.py --dry-run
+
+# Upload all pending runs
+python experiments/sync.py
+```
+
+Runs already in the database are skipped automatically.
+
 ## Running tests
 
 ```bash

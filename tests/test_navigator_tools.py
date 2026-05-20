@@ -94,6 +94,58 @@ def test_trace_subsequent_tool_calls_have_none_tokens():
 
 
 @pytest.mark.asyncio
+async def test_get_shared_memory_returns_other_agents():
+    from src.memory.shared import SharedMemoryStore
+    maze = generate_maze(seed=42)
+    store = SharedMemoryStore()
+    await store.record("2", 5, 3, 1)
+    await store.record("2", 6, 3, 2)
+    await store.record("3", 9, 7, 1)
+
+    agent = NavigatorAgent(
+        agent_id="1", agent_index=0, maze=maze,
+        model="claude-sonnet-4-6", shared_memory=store,
+    )
+
+    class FakeToolCall:
+        class function:
+            name = "get_shared_memory"
+            arguments = "{}"
+        id = "fake"
+
+    result = await agent._execute(FakeToolCall())
+    assert "agent_2" in result
+    assert "agent_3" in result
+    assert "agent_1" not in result  # excludes self
+    assert result["agent_2"]["current"] == {"x": 6, "y": 3}
+    assert len(result["agent_2"]["visited"]) == 2
+
+
+@pytest.mark.asyncio
+async def test_get_shared_memory_excludes_self():
+    from src.memory.shared import SharedMemoryStore
+    maze = generate_maze(seed=42)
+    store = SharedMemoryStore()
+    await store.record("1", 1, 1, 1)
+    await store.record("2", 5, 3, 1)
+
+    agent = NavigatorAgent(
+        agent_id="1", agent_index=0, maze=maze,
+        model="claude-sonnet-4-6", shared_memory=store,
+    )
+
+    class FakeToolCall:
+        class function:
+            name = "get_shared_memory"
+            arguments = "{}"
+        id = "fake"
+
+    result = await agent._execute(FakeToolCall())
+    assert "agent_1" not in result
+    assert "agent_2" in result
+
+
+@pytest.mark.asyncio
 async def test_move_writes_to_shared_memory():
     from src.memory.shared import SharedMemoryStore
     maze = generate_maze(seed=42)

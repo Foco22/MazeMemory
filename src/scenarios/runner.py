@@ -1,5 +1,6 @@
 import asyncio
 from datetime import datetime, timezone
+from pathlib import Path
 from src.maze.generator import Maze
 from src.memory.shared import SharedMemoryStore
 from src.agents.navigator import NavigatorAgent
@@ -16,10 +17,11 @@ async def run_scenario(
     run_number: int,
     lookahead: int = 3,
     on_move=None,
+    shared_memory_log: Path | None = None,
 ) -> dict:
     assert scenario in SCENARIOS, f"Unknown scenario: {scenario}"
 
-    shared_memory = SharedMemoryStore() if scenario != "baseline" else None
+    shared_memory = SharedMemoryStore(log_path=shared_memory_log) if scenario != "baseline" else None
 
     observer = (
         ObserverAgent(maze, model_config.model, shared_memory)

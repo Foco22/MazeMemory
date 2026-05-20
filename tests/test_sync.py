@@ -27,7 +27,9 @@ def make_result(scenario="baseline", maze_id=1, run_number=1, started_at="2026-0
 
 @pytest.fixture
 def results_dir(tmp_path):
-    return tmp_path
+    d = tmp_path / "experiments"
+    d.mkdir()
+    return d
 
 
 def write_result(results_dir, filename, result):

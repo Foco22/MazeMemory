@@ -3318,3 +3318,562 @@
 [2026-05-20 13:44:36.141] [A1] get_surroundings({}) → {'north': 1, 'south': 1, 'east': 0, 'west': 0}
 [2026-05-20 13:44:36.141] [A1] get_distance_to_exit({}) → {'steps': 1}
 [2026-05-20 13:44:37.473] [A1] move({'direction': 'south'}) → {'success': True, 'position': {'x': 3, 'y': 3}}
+[2026-05-20 13:51:03.191] [A1] get_shared_memory({}) → {'agent_2': {'current': {'x': 6, 'y': 3}, 'visited': [{'x': 5, 'y': 3}, {'x': 6, 'y': 3}]}, 'agent_3': {'current': {'x': 9, 'y': 7}, 'visited': [{'x': 9, 'y': 7}]}}
+[2026-05-20 13:51:03.192] [A1] get_shared_memory({}) → {'agent_2': {'current': {'x': 5, 'y': 3}, 'visited': [{'x': 5, 'y': 3}]}}
+[2026-05-20 13:54:52.623] [A1] get_shared_memory({}) → {'agent_2': {'current': {'x': 6, 'y': 3}, 'visited': [{'x': 5, 'y': 3}, {'x': 6, 'y': 3}]}, 'agent_3': {'current': {'x': 9, 'y': 7}, 'visited': [{'x': 9, 'y': 7}]}}
+[2026-05-20 13:54:52.624] [A1] get_shared_memory({}) → {'agent_2': {'current': {'x': 5, 'y': 3}, 'visited': [{'x': 5, 'y': 3}]}}
+[2026-05-20 14:00:47.004] [A1] get_shared_memory({}) → {'agent_2': {'current': {'x': 6, 'y': 3}, 'visited': [{'x': 5, 'y': 3}, {'x': 6, 'y': 3}]}, 'agent_3': {'current': {'x': 9, 'y': 7}, 'visited': [{'x': 9, 'y': 7}]}}
+[2026-05-20 14:00:47.005] [A1] get_shared_memory({}) → {'agent_2': {'current': {'x': 5, 'y': 3}, 'visited': [{'x': 5, 'y': 3}]}}
+[2026-05-20 14:02:17.449] [A2] get_location({}) → {'x': 1, 'y': 13}
+[2026-05-20 14:02:17.450] [A2] get_surroundings({}) → {'north': 3, 'south': 0, 'east': 3, 'west': 0}
+[2026-05-20 14:02:17.450] [A2] get_distance_to_exit({}) → {'steps': 16}
+[2026-05-20 14:02:41.624] [A2] get_location({}) → {'x': 1, 'y': 3}
+[2026-05-20 14:02:41.624] [A2] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 2, 'west': 0}
+[2026-05-20 14:02:41.624] [A2] get_distance_to_exit({}) → {'steps': 2}
+[2026-05-20 14:02:41.625] [A2] get_shared_memory({}) → {}
+[2026-05-20 14:02:41.801] [A3] get_location({}) → {'x': 3, 'y': 1}
+[2026-05-20 14:02:41.801] [A3] get_surroundings({}) → {'north': 0, 'south': 2, 'east': 0, 'west': 2}
+[2026-05-20 14:02:41.802] [A3] get_distance_to_exit({}) → {'steps': 2}
+[2026-05-20 14:02:41.802] [A3] get_shared_memory({}) → {}
+[2026-05-20 14:02:41.876] [A1] get_location({}) → {'x': 1, 'y': 1}
+[2026-05-20 14:02:41.876] [A1] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 2, 'west': 0}
+[2026-05-20 14:02:41.876] [A1] get_distance_to_exit({}) → {'steps': 4}
+[2026-05-20 14:02:41.876] [A1] get_shared_memory({}) → {}
+[2026-05-20 14:02:42.926] [A2] move({'direction': 'east'}) → {'success': True, 'position': {'x': 2, 'y': 3}}
+[2026-05-20 14:02:42.987] [A1] move({'direction': 'east'}) → {'success': True, 'position': {'x': 2, 'y': 1}}
+[2026-05-20 14:02:43.238] [A3] move({'direction': 'south'}) → {'success': True, 'position': {'x': 3, 'y': 2}}
+[2026-05-20 14:02:44.217] [A1] get_location({}) → {'x': 2, 'y': 1}
+[2026-05-20 14:02:44.218] [A1] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 1, 'west': 1}
+[2026-05-20 14:02:44.218] [A1] get_distance_to_exit({}) → {'steps': 3}
+[2026-05-20 14:02:44.231] [A3] get_distance_to_exit({}) → {'steps': 1}
+[2026-05-20 14:02:44.231] [A3] get_surroundings({}) → {'north': 1, 'south': 1, 'east': 0, 'west': 0}
+[2026-05-20 14:02:44.460] [A2] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 1, 'west': 1}
+[2026-05-20 14:02:44.460] [A2] get_distance_to_exit({}) → {'steps': 1}
+[2026-05-20 14:02:45.691] [A2] move({'direction': 'east'}) → {'success': True, 'position': {'x': 3, 'y': 3}}
+[2026-05-20 14:02:45.734] [A3] move({'direction': 'south'}) → {'success': True, 'position': {'x': 3, 'y': 3}}
+[2026-05-20 14:02:45.759] [A1] move({'direction': 'east'}) → {'success': True, 'position': {'x': 3, 'y': 1}}
+[2026-05-20 14:02:47.021] [A1] get_surroundings({}) → {'north': 0, 'south': 2, 'east': 0, 'west': 2}
+[2026-05-20 14:02:47.021] [A1] get_distance_to_exit({}) → {'steps': 2}
+[2026-05-20 14:02:48.352] [A1] move({'direction': 'south'}) → {'success': True, 'position': {'x': 3, 'y': 2}}
+[2026-05-20 14:03:00.156] [A1] get_location({}) → {'x': 1, 'y': 1}
+[2026-05-20 14:03:00.157] [A1] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 2, 'west': 0}
+[2026-05-20 14:03:00.157] [A1] get_distance_to_exit({}) → {'steps': 4}
+[2026-05-20 14:03:00.157] [A1] get_shared_memory({}) → {}
+[2026-05-20 14:03:00.163] [A3] get_location({}) → {'x': 3, 'y': 1}
+[2026-05-20 14:03:00.163] [A3] get_surroundings({}) → {'north': 0, 'south': 2, 'east': 0, 'west': 2}
+[2026-05-20 14:03:00.163] [A3] get_distance_to_exit({}) → {'steps': 2}
+[2026-05-20 14:03:00.163] [A3] get_shared_memory({}) → {}
+[2026-05-20 14:03:00.169] [A2] get_location({}) → {'x': 1, 'y': 3}
+[2026-05-20 14:03:00.169] [A2] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 2, 'west': 0}
+[2026-05-20 14:03:00.169] [A2] get_distance_to_exit({}) → {'steps': 2}
+[2026-05-20 14:03:00.169] [A2] get_shared_memory({}) → {}
+[2026-05-20 14:03:01.667] [A1] move({'direction': 'east'}) → {'success': True, 'position': {'x': 2, 'y': 1}}
+[2026-05-20 14:03:01.700] [A3] move({'direction': 'south'}) → {'success': True, 'position': {'x': 3, 'y': 2}}
+[2026-05-20 14:03:01.761] [A2] move({'direction': 'east'}) → {'success': True, 'position': {'x': 2, 'y': 3}}
+[2026-05-20 14:03:02.690] [A2] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 1, 'west': 1}
+[2026-05-20 14:03:02.690] [A2] get_distance_to_exit({}) → {'steps': 1}
+[2026-05-20 14:03:02.997] [A3] get_distance_to_exit({}) → {'steps': 1}
+[2026-05-20 14:03:02.997] [A3] get_surroundings({}) → {'north': 1, 'south': 1, 'east': 0, 'west': 0}
+[2026-05-20 14:03:03.004] [A1] get_location({}) → {'x': 2, 'y': 1}
+[2026-05-20 14:03:03.005] [A1] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 1, 'west': 1}
+[2026-05-20 14:03:03.005] [A1] get_distance_to_exit({}) → {'steps': 3}
+[2026-05-20 14:03:04.227] [A2] move({'direction': 'east'}) → {'success': True, 'position': {'x': 3, 'y': 3}}
+[2026-05-20 14:03:04.433] [A3] move({'direction': 'south'}) → {'success': True, 'position': {'x': 3, 'y': 3}}
+[2026-05-20 14:03:04.523] [A1] move({'direction': 'east'}) → {'success': True, 'position': {'x': 3, 'y': 1}}
+[2026-05-20 14:03:05.658] [A1] get_surroundings({}) → {'north': 0, 'south': 2, 'east': 0, 'west': 2}
+[2026-05-20 14:03:05.658] [A1] get_distance_to_exit({}) → {'steps': 2}
+[2026-05-20 14:03:07.030] [A1] move({'direction': 'south'}) → {'success': True, 'position': {'x': 3, 'y': 2}}
+[2026-05-20 14:03:08.119] [A1] get_surroundings({}) → {'north': 1, 'south': 1, 'east': 0, 'west': 0}
+[2026-05-20 14:03:08.119] [A1] get_distance_to_exit({}) → {'steps': 1}
+[2026-05-20 14:03:19.193] [A2] get_location({}) → {'x': 1, 'y': 13}
+[2026-05-20 14:03:19.193] [A2] get_surroundings({}) → {'north': 3, 'south': 0, 'east': 3, 'west': 0}
+[2026-05-20 14:03:19.193] [A2] get_distance_to_exit({}) → {'steps': 16}
+[2026-05-20 14:03:19.193] [A2] get_shared_memory({}) → {}
+[2026-05-20 14:03:19.196] [A3] get_location({}) → {'x': 13, 'y': 1}
+[2026-05-20 14:03:19.196] [A3] get_surroundings({}) → {'north': 0, 'south': 2, 'east': 0, 'west': 3}
+[2026-05-20 14:03:19.196] [A3] get_distance_to_exit({}) → {'steps': 52}
+[2026-05-20 14:03:19.196] [A3] get_shared_memory({}) → {}
+[2026-05-20 14:03:19.200] [A1] get_location({}) → {'x': 1, 'y': 1}
+[2026-05-20 14:03:19.200] [A1] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 3, 'west': 0}
+[2026-05-20 14:03:19.200] [A1] get_distance_to_exit({}) → {'steps': 64}
+[2026-05-20 14:03:19.200] [A1] get_shared_memory({}) → {}
+[2026-05-20 14:03:20.818] [A1] move({'direction': 'east'}) → {'success': True, 'position': {'x': 2, 'y': 1}}
+[2026-05-20 14:03:20.828] [A2] move({'direction': 'east'}) → {'success': True, 'position': {'x': 2, 'y': 13}}
+[2026-05-20 14:03:20.928] [A3] move({'direction': 'west'}) → {'success': True, 'position': {'x': 12, 'y': 1}}
+[2026-05-20 14:03:22.250] [A2] get_location({}) → {'x': 2, 'y': 13}
+[2026-05-20 14:03:22.250] [A2] get_distance_to_exit({}) → {'steps': 15}
+[2026-05-20 14:03:22.250] [A2] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 3, 'west': 1}
+[2026-05-20 14:03:22.253] [A1] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 3, 'west': 1}
+[2026-05-20 14:03:22.254] [A1] get_distance_to_exit({}) → {'steps': 63}
+[2026-05-20 14:03:22.254] [A1] get_location({}) → {'x': 2, 'y': 1}
+[2026-05-20 14:03:22.257] [A3] get_location({}) → {'x': 12, 'y': 1}
+[2026-05-20 14:03:22.257] [A3] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 1, 'west': 3}
+[2026-05-20 14:03:22.257] [A3] get_distance_to_exit({}) → {'steps': 53}
+[2026-05-20 14:03:23.785] [A2] move({'direction': 'east'}) → {'success': True, 'position': {'x': 3, 'y': 13}}
+[2026-05-20 14:03:23.815] [A3] move({'direction': 'west'}) → {'success': True, 'position': {'x': 11, 'y': 1}}
+[2026-05-20 14:03:24.095] [A1] move({'direction': 'east'}) → {'success': True, 'position': {'x': 3, 'y': 1}}
+[2026-05-20 14:03:24.835] [A3] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 2, 'west': 3}
+[2026-05-20 14:03:24.836] [A3] get_distance_to_exit({}) → {'steps': 54}
+[2026-05-20 14:03:24.839] [A2] get_distance_to_exit({}) → {'steps': 14}
+[2026-05-20 14:03:24.839] [A2] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 3, 'west': 2}
+[2026-05-20 14:03:24.971] [A1] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 3, 'west': 2}
+[2026-05-20 14:03:24.972] [A1] get_distance_to_exit({}) → {'steps': 62}
+[2026-05-20 14:03:26.245] [A1] move({'direction': 'east'}) → {'success': True, 'position': {'x': 4, 'y': 1}}
+[2026-05-20 14:03:26.551] [A2] move({'direction': 'east'}) → {'success': True, 'position': {'x': 4, 'y': 13}}
+[2026-05-20 14:03:27.323] [A1] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 3, 'west': 3}
+[2026-05-20 14:03:27.325] [A1] get_distance_to_exit({}) → {'steps': 61}
+[2026-05-20 14:03:27.371] [A3] move({'direction': 'east'}) → {'success': True, 'position': {'x': 12, 'y': 1}}
+[2026-05-20 14:03:27.682] [A2] get_distance_to_exit({}) → {'steps': 13}
+[2026-05-20 14:03:27.683] [A2] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 3, 'west': 3}
+[2026-05-20 14:03:28.495] [A1] move({'direction': 'east'}) → {'success': True, 'position': {'x': 5, 'y': 1}}
+[2026-05-20 14:03:28.837] [A2] move({'direction': 'east'}) → {'success': True, 'position': {'x': 5, 'y': 13}}
+[2026-05-20 14:03:28.850] [A3] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 1, 'west': 3}
+[2026-05-20 14:03:28.851] [A3] get_distance_to_exit({}) → {'steps': 53}
+[2026-05-20 14:03:29.520] [A1] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 3, 'west': 3}
+[2026-05-20 14:03:29.521] [A1] get_distance_to_exit({}) → {'steps': 60}
+[2026-05-20 14:03:29.829] [A2] get_distance_to_exit({}) → {'steps': 12}
+[2026-05-20 14:03:29.830] [A2] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 2, 'west': 3}
+[2026-05-20 14:03:30.032] [A3] move({'direction': 'east'}) → {'success': True, 'position': {'x': 13, 'y': 1}}
+[2026-05-20 14:03:30.494] [A1] move({'direction': 'east'}) → {'success': True, 'position': {'x': 6, 'y': 1}}
+[2026-05-20 14:03:31.261] [A2] move({'direction': 'east'}) → {'success': True, 'position': {'x': 6, 'y': 13}}
+[2026-05-20 14:03:31.298] [A3] get_surroundings({}) → {'north': 0, 'south': 2, 'east': 0, 'west': 3}
+[2026-05-20 14:03:31.299] [A3] get_distance_to_exit({}) → {'steps': 52}
+[2026-05-20 14:03:31.630] [A1] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 3, 'west': 3}
+[2026-05-20 14:03:31.632] [A1] get_distance_to_exit({}) → {'steps': 59}
+[2026-05-20 14:03:32.288] [A2] get_distance_to_exit({}) → {'steps': 11}
+[2026-05-20 14:03:32.288] [A2] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 1, 'west': 3}
+[2026-05-20 14:03:32.697] [A3] move({'direction': 'south'}) → {'success': True, 'position': {'x': 13, 'y': 2}}
+[2026-05-20 14:03:32.708] [A1] move({'direction': 'east'}) → {'success': True, 'position': {'x': 7, 'y': 1}}
+[2026-05-20 14:03:33.411] [A2] move({'direction': 'east'}) → {'success': True, 'position': {'x': 7, 'y': 13}}
+[2026-05-20 14:03:33.723] [A3] get_surroundings({}) → {'north': 1, 'south': 1, 'east': 0, 'west': 0}
+[2026-05-20 14:03:33.725] [A3] get_distance_to_exit({}) → {'steps': 51}
+[2026-05-20 14:03:33.760] [A1] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 3, 'west': 3}
+[2026-05-20 14:03:33.760] [A1] get_distance_to_exit({}) → {'steps': 58}
+[2026-05-20 14:03:34.538] [A2] get_distance_to_exit({}) → {'steps': 10}
+[2026-05-20 14:03:34.538] [A2] get_surroundings({}) → {'north': 2, 'south': 0, 'east': 0, 'west': 3}
+[2026-05-20 14:03:34.846] [A3] move({'direction': 'south'}) → {'success': True, 'position': {'x': 13, 'y': 3}}
+[2026-05-20 14:03:35.156] [A1] move({'direction': 'east'}) → {'success': True, 'position': {'x': 8, 'y': 1}}
+[2026-05-20 14:03:35.869] [A3] get_surroundings({}) → {'north': 2, 'south': 0, 'east': 0, 'west': 2}
+[2026-05-20 14:03:35.869] [A3] get_distance_to_exit({}) → {'steps': 50}
+[2026-05-20 14:03:35.873] [A2] move({'direction': 'north'}) → {'success': True, 'position': {'x': 7, 'y': 12}}
+[2026-05-20 14:03:35.913] [A1] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 3, 'west': 3}
+[2026-05-20 14:03:35.914] [A1] get_distance_to_exit({}) → {'steps': 57}
+[2026-05-20 14:03:36.891] [A2] get_distance_to_exit({}) → {'steps': 9}
+[2026-05-20 14:03:36.891] [A2] get_surroundings({}) → {'north': 1, 'south': 1, 'east': 0, 'west': 0}
+[2026-05-20 14:03:37.267] [A1] move({'direction': 'east'}) → {'success': True, 'position': {'x': 9, 'y': 1}}
+[2026-05-20 14:03:37.506] [A3] move({'direction': 'west'}) → {'success': True, 'position': {'x': 12, 'y': 3}}
+[2026-05-20 14:03:38.121] [A2] move({'direction': 'north'}) → {'success': True, 'position': {'x': 7, 'y': 11}}
+[2026-05-20 14:03:38.334] [A1] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 3, 'west': 3}
+[2026-05-20 14:03:38.335] [A1] get_distance_to_exit({}) → {'steps': 56}
+[2026-05-20 14:03:38.459] [A3] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 1, 'west': 1}
+[2026-05-20 14:03:38.460] [A3] get_distance_to_exit({}) → {'steps': 49}
+[2026-05-20 14:03:39.155] [A2] get_distance_to_exit({}) → {'steps': 8}
+[2026-05-20 14:03:39.155] [A2] get_surroundings({}) → {'north': 0, 'south': 2, 'east': 3, 'west': 2}
+[2026-05-20 14:03:39.606] [A3] move({'direction': 'west'}) → {'success': True, 'position': {'x': 11, 'y': 3}}
+[2026-05-20 14:03:39.619] [A1] move({'direction': 'east'}) → {'success': True, 'position': {'x': 10, 'y': 1}}
+[2026-05-20 14:03:40.577] [A3] get_surroundings({}) → {'north': 0, 'south': 2, 'east': 2, 'west': 0}
+[2026-05-20 14:03:40.578] [A3] get_distance_to_exit({}) → {'steps': 48}
+[2026-05-20 14:03:40.593] [A2] move({'direction': 'east'}) → {'success': True, 'position': {'x': 8, 'y': 11}}
+[2026-05-20 14:03:40.888] [A1] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 3, 'west': 3}
+[2026-05-20 14:03:40.889] [A1] get_distance_to_exit({}) → {'steps': 55}
+[2026-05-20 14:03:41.606] [A2] get_distance_to_exit({}) → {'steps': 7}
+[2026-05-20 14:03:41.606] [A2] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 3, 'west': 3}
+[2026-05-20 14:03:41.911] [A3] move({'direction': 'south'}) → {'success': True, 'position': {'x': 11, 'y': 4}}
+[2026-05-20 14:03:41.992] [A1] move({'direction': 'east'}) → {'success': True, 'position': {'x': 11, 'y': 1}}
+[2026-05-20 14:03:42.732] [A2] move({'direction': 'east'}) → {'success': True, 'position': {'x': 9, 'y': 11}}
+[2026-05-20 14:03:42.852] [A3] get_surroundings({}) → {'north': 1, 'south': 1, 'east': 0, 'west': 0}
+[2026-05-20 14:03:42.854] [A3] get_distance_to_exit({}) → {'steps': 47}
+[2026-05-20 14:03:43.547] [A1] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 2, 'west': 3}
+[2026-05-20 14:03:43.548] [A1] get_distance_to_exit({}) → {'steps': 54}
+[2026-05-20 14:03:43.982] [A3] move({'direction': 'south'}) → {'success': True, 'position': {'x': 11, 'y': 5}}
+[2026-05-20 14:03:44.369] [A2] get_distance_to_exit({}) → {'steps': 6}
+[2026-05-20 14:03:44.370] [A2] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 2, 'west': 3}
+[2026-05-20 14:03:44.465] [A1] move({'direction': 'east'}) → {'success': True, 'position': {'x': 12, 'y': 1}}
+[2026-05-20 14:03:45.186] [A3] get_surroundings({}) → {'north': 2, 'south': 0, 'east': 2, 'west': 0}
+[2026-05-20 14:03:45.187] [A3] get_distance_to_exit({}) → {'steps': 46}
+[2026-05-20 14:03:45.493] [A1] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 1, 'west': 3}
+[2026-05-20 14:03:45.494] [A1] get_distance_to_exit({}) → {'steps': 53}
+[2026-05-20 14:03:45.505] [A2] move({'direction': 'east'}) → {'success': True, 'position': {'x': 10, 'y': 11}}
+[2026-05-20 14:03:46.313] [A3] move({'direction': 'east'}) → {'success': True, 'position': {'x': 12, 'y': 5}}
+[2026-05-20 14:03:46.723] [A2] get_distance_to_exit({}) → {'steps': 5}
+[2026-05-20 14:03:46.724] [A2] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 1, 'west': 3}
+[2026-05-20 14:03:46.929] [A1] move({'direction': 'east'}) → {'success': True, 'position': {'x': 13, 'y': 1}}
+[2026-05-20 14:03:47.372] [A3] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 1, 'west': 1}
+[2026-05-20 14:03:47.374] [A3] get_distance_to_exit({}) → {'steps': 45}
+[2026-05-20 14:03:47.808] [A2] move({'direction': 'east'}) → {'success': True, 'position': {'x': 11, 'y': 11}}
+[2026-05-20 14:03:47.914] [A1] get_surroundings({}) → {'north': 0, 'south': 2, 'east': 0, 'west': 3}
+[2026-05-20 14:03:47.916] [A1] get_distance_to_exit({}) → {'steps': 52}
+[2026-05-20 14:03:48.772] [A3] get_shared_memory({}) → {'agent_1': {'current': {'x': 13, 'y': 1}, 'visited': [{'x': 2, 'y': 1}, {'x': 3, 'y': 1}, {'x': 4, 'y': 1}, {'x': 5, 'y': 1}, {'x': 6, 'y': 1}, {'x': 7, 'y': 1}, {'x': 8, 'y': 1}, {'x': 9, 'y': 1}, {'x': 10, 'y': 1}, {'x': 11, 'y': 1}, {'x': 12, 'y': 1}, {'x': 13, 'y': 1}]}, 'agent_2': {'current': {'x': 11, 'y': 11}, 'visited': [{'x': 2, 'y': 13}, {'x': 3, 'y': 13}, {'x': 4, 'y': 13}, {'x': 5, 'y': 13}, {'x': 6, 'y': 13}, {'x': 7, 'y': 13}, {'x': 7, 'y': 12}, {'x': 7, 'y': 11}, {'x': 8, 'y': 11}, {'x': 9, 'y': 11}, {'x': 10, 'y': 11}, {'x': 11, 'y': 11}]}}
+[2026-05-20 14:03:49.077] [A2] get_distance_to_exit({}) → {'steps': 4}
+[2026-05-20 14:03:49.077] [A2] get_surroundings({}) → {'north': 0, 'south': 2, 'east': 0, 'west': 3}
+[2026-05-20 14:03:49.215] [A1] move({'direction': 'south'}) → {'success': True, 'position': {'x': 13, 'y': 2}}
+[2026-05-20 14:03:50.307] [A2] move({'direction': 'south'}) → {'success': True, 'position': {'x': 11, 'y': 12}}
+[2026-05-20 14:03:50.310] [A1] get_surroundings({}) → {'north': 1, 'south': 1, 'east': 0, 'west': 0}
+[2026-05-20 14:03:50.310] [A1] get_distance_to_exit({}) → {'steps': 51}
+[2026-05-20 14:03:50.508] [A3] move({'direction': 'east'}) → {'success': True, 'position': {'x': 13, 'y': 5}}
+[2026-05-20 14:03:51.331] [A2] get_distance_to_exit({}) → {'steps': 3}
+[2026-05-20 14:03:51.331] [A2] get_surroundings({}) → {'north': 1, 'south': 1, 'east': 0, 'west': 0}
+[2026-05-20 14:03:51.539] [A3] get_surroundings({}) → {'north': 0, 'south': 2, 'east': 0, 'west': 2}
+[2026-05-20 14:03:51.540] [A3] get_distance_to_exit({}) → {'steps': 44}
+[2026-05-20 14:03:51.643] [A1] move({'direction': 'south'}) → {'success': True, 'position': {'x': 13, 'y': 3}}
+[2026-05-20 14:03:52.661] [A1] get_surroundings({}) → {'north': 2, 'south': 0, 'east': 0, 'west': 2}
+[2026-05-20 14:03:52.662] [A1] get_distance_to_exit({}) → {'steps': 50}
+[2026-05-20 14:03:52.867] [A2] move({'direction': 'south'}) → {'success': True, 'position': {'x': 11, 'y': 13}}
+[2026-05-20 14:03:53.175] [A3] move({'direction': 'south'}) → {'success': True, 'position': {'x': 13, 'y': 6}}
+[2026-05-20 14:03:54.197] [A2] get_distance_to_exit({}) → {'steps': 2}
+[2026-05-20 14:03:54.197] [A2] get_surroundings({}) → {'north': 2, 'south': 0, 'east': 2, 'west': 2}
+[2026-05-20 14:03:54.201] [A1] get_shared_memory({}) → {'agent_2': {'current': {'x': 11, 'y': 13}, 'visited': [{'x': 2, 'y': 13}, {'x': 3, 'y': 13}, {'x': 4, 'y': 13}, {'x': 5, 'y': 13}, {'x': 6, 'y': 13}, {'x': 7, 'y': 13}, {'x': 7, 'y': 12}, {'x': 7, 'y': 11}, {'x': 8, 'y': 11}, {'x': 9, 'y': 11}, {'x': 10, 'y': 11}, {'x': 11, 'y': 11}, {'x': 11, 'y': 12}, {'x': 11, 'y': 13}]}, 'agent_3': {'current': {'x': 13, 'y': 6}, 'visited': [{'x': 12, 'y': 1}, {'x': 11, 'y': 1}, {'x': 12, 'y': 1}, {'x': 13, 'y': 1}, {'x': 13, 'y': 2}, {'x': 13, 'y': 3}, {'x': 12, 'y': 3}, {'x': 11, 'y': 3}, {'x': 11, 'y': 4}, {'x': 11, 'y': 5}, {'x': 12, 'y': 5}, {'x': 13, 'y': 5}, {'x': 13, 'y': 6}]}}
+[2026-05-20 14:03:54.505] [A3] get_surroundings({}) → {'north': 1, 'south': 1, 'east': 0, 'west': 0}
+[2026-05-20 14:03:54.506] [A3] get_distance_to_exit({}) → {'steps': 43}
+[2026-05-20 14:03:55.835] [A3] move({'direction': 'south'}) → {'success': True, 'position': {'x': 13, 'y': 7}}
+[2026-05-20 14:03:55.840] [A2] move({'direction': 'east'}) → {'success': True, 'position': {'x': 12, 'y': 13}}
+[2026-05-20 14:03:56.858] [A2] get_distance_to_exit({}) → {'steps': 1}
+[2026-05-20 14:03:56.859] [A2] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 1, 'west': 3}
+[2026-05-20 14:03:57.170] [A1] move({'direction': 'north'}) → {'success': True, 'position': {'x': 13, 'y': 2}}
+[2026-05-20 14:03:57.184] [A3] get_surroundings({}) → {'north': 2, 'south': 0, 'east': 0, 'west': 3}
+[2026-05-20 14:03:57.186] [A3] get_distance_to_exit({}) → {'steps': 42}
+[2026-05-20 14:03:58.090] [A2] move({'direction': 'east'}) → {'success': True, 'position': {'x': 13, 'y': 13}}
+[2026-05-20 14:03:58.601] [A3] move({'direction': 'west'}) → {'success': True, 'position': {'x': 12, 'y': 7}}
+[2026-05-20 14:03:59.524] [A1] move({'direction': 'west'}) → {'success': False, 'position': {'x': 13, 'y': 2}, 'reason': 'wall'}
+[2026-05-20 14:03:59.727] [A3] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 1, 'west': 3}
+[2026-05-20 14:03:59.729] [A3] get_distance_to_exit({}) → {'steps': 41}
+[2026-05-20 14:04:00.855] [A3] move({'direction': 'west'}) → {'success': True, 'position': {'x': 11, 'y': 7}}
+[2026-05-20 14:04:01.058] [A1] get_location({}) → {'x': 13, 'y': 2}
+[2026-05-20 14:04:01.059] [A1] get_surroundings({}) → {'north': 1, 'south': 1, 'east': 0, 'west': 0}
+[2026-05-20 14:04:01.060] [A1] get_distance_to_exit({}) → {'steps': 51}
+[2026-05-20 14:04:01.875] [A3] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 2, 'west': 3}
+[2026-05-20 14:04:01.875] [A3] get_distance_to_exit({}) → {'steps': 40}
+[2026-05-20 14:04:02.904] [A3] move({'direction': 'west'}) → {'success': True, 'position': {'x': 10, 'y': 7}}
+[2026-05-20 14:04:03.825] [A3] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 3, 'west': 3}
+[2026-05-20 14:04:03.825] [A3] get_distance_to_exit({}) → {'steps': 39}
+[2026-05-20 14:04:04.029] [A1] move({'direction': 'south'}) → {'success': True, 'position': {'x': 13, 'y': 3}}
+[2026-05-20 14:04:04.974] [A3] move({'direction': 'west'}) → {'success': True, 'position': {'x': 9, 'y': 7}}
+[2026-05-20 14:04:06.075] [A3] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 3, 'west': 2}
+[2026-05-20 14:04:06.076] [A3] get_distance_to_exit({}) → {'steps': 38}
+[2026-05-20 14:04:06.128] [A1] get_surroundings({}) → {'north': 2, 'south': 0, 'east': 0, 'west': 2}
+[2026-05-20 14:04:06.129] [A1] get_distance_to_exit({}) → {'steps': 50}
+[2026-05-20 14:04:07.305] [A3] move({'direction': 'west'}) → {'success': True, 'position': {'x': 8, 'y': 7}}
+[2026-05-20 14:04:07.319] [A1] get_shared_memory({}) → {'agent_2': {'current': {'x': 13, 'y': 13}, 'visited': [{'x': 2, 'y': 13}, {'x': 3, 'y': 13}, {'x': 4, 'y': 13}, {'x': 5, 'y': 13}, {'x': 6, 'y': 13}, {'x': 7, 'y': 13}, {'x': 7, 'y': 12}, {'x': 7, 'y': 11}, {'x': 8, 'y': 11}, {'x': 9, 'y': 11}, {'x': 10, 'y': 11}, {'x': 11, 'y': 11}, {'x': 11, 'y': 12}, {'x': 11, 'y': 13}, {'x': 12, 'y': 13}, {'x': 13, 'y': 13}]}, 'agent_3': {'current': {'x': 8, 'y': 7}, 'visited': [{'x': 12, 'y': 1}, {'x': 11, 'y': 1}, {'x': 12, 'y': 1}, {'x': 13, 'y': 1}, {'x': 13, 'y': 2}, {'x': 13, 'y': 3}, {'x': 12, 'y': 3}, {'x': 11, 'y': 3}, {'x': 11, 'y': 4}, {'x': 11, 'y': 5}, {'x': 12, 'y': 5}, {'x': 13, 'y': 5}, {'x': 13, 'y': 6}, {'x': 13, 'y': 7}, {'x': 12, 'y': 7}, {'x': 11, 'y': 7}, {'x': 10, 'y': 7}, {'x': 9, 'y': 7}, {'x': 8, 'y': 7}]}}
+[2026-05-20 14:04:08.298] [A3] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 3, 'west': 1}
+[2026-05-20 14:04:08.299] [A3] get_distance_to_exit({}) → {'steps': 37}
+[2026-05-20 14:04:08.841] [A1] move({'direction': 'west'}) → {'success': True, 'position': {'x': 12, 'y': 3}}
+[2026-05-20 14:04:09.255] [A3] move({'direction': 'west'}) → {'success': True, 'position': {'x': 7, 'y': 7}}
+[2026-05-20 14:04:10.071] [A1] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 1, 'west': 1}
+[2026-05-20 14:04:10.278] [A3] get_surroundings({}) → {'north': 0, 'south': 2, 'east': 3, 'west': 0}
+[2026-05-20 14:04:10.279] [A3] get_distance_to_exit({}) → {'steps': 36}
+[2026-05-20 14:04:11.092] [A1] get_distance_to_exit({}) → {'steps': 49}
+[2026-05-20 14:04:11.300] [A3] move({'direction': 'south'}) → {'success': True, 'position': {'x': 7, 'y': 8}}
+[2026-05-20 14:04:13.448] [A3] get_surroundings({}) → {'north': 1, 'south': 1, 'east': 0, 'west': 0}
+[2026-05-20 14:04:13.448] [A3] get_distance_to_exit({}) → {'steps': 35}
+[2026-05-20 14:04:14.474] [A3] move({'direction': 'south'}) → {'success': True, 'position': {'x': 7, 'y': 9}}
+[2026-05-20 14:04:15.089] [A1] move({'direction': 'east'}) → {'success': True, 'position': {'x': 13, 'y': 3}}
+[2026-05-20 14:04:15.388] [A3] get_surroundings({}) → {'north': 2, 'south': 0, 'east': 0, 'west': 2}
+[2026-05-20 14:04:15.389] [A3] get_distance_to_exit({}) → {'steps': 34}
+[2026-05-20 14:04:16.315] [A1] get_surroundings({}) → {'north': 2, 'south': 0, 'east': 0, 'west': 2}
+[2026-05-20 14:04:16.885] [A3] get_shared_memory({}) → {'agent_1': {'current': {'x': 13, 'y': 3}, 'visited': [{'x': 2, 'y': 1}, {'x': 3, 'y': 1}, {'x': 4, 'y': 1}, {'x': 5, 'y': 1}, {'x': 6, 'y': 1}, {'x': 7, 'y': 1}, {'x': 8, 'y': 1}, {'x': 9, 'y': 1}, {'x': 10, 'y': 1}, {'x': 11, 'y': 1}, {'x': 12, 'y': 1}, {'x': 13, 'y': 1}, {'x': 13, 'y': 2}, {'x': 13, 'y': 3}, {'x': 13, 'y': 2}, {'x': 13, 'y': 3}, {'x': 12, 'y': 3}, {'x': 13, 'y': 3}]}, 'agent_2': {'current': {'x': 13, 'y': 13}, 'visited': [{'x': 2, 'y': 13}, {'x': 3, 'y': 13}, {'x': 4, 'y': 13}, {'x': 5, 'y': 13}, {'x': 6, 'y': 13}, {'x': 7, 'y': 13}, {'x': 7, 'y': 12}, {'x': 7, 'y': 11}, {'x': 8, 'y': 11}, {'x': 9, 'y': 11}, {'x': 10, 'y': 11}, {'x': 11, 'y': 11}, {'x': 11, 'y': 12}, {'x': 11, 'y': 13}, {'x': 12, 'y': 13}, {'x': 13, 'y': 13}]}}
+[2026-05-20 14:04:17.750] [A1] move({'direction': 'north'}) → {'success': True, 'position': {'x': 13, 'y': 2}}
+[2026-05-20 14:04:18.569] [A1] get_surroundings({}) → {'north': 1, 'south': 1, 'east': 0, 'west': 0}
+[2026-05-20 14:04:18.969] [A3] move({'direction': 'west'}) → {'success': True, 'position': {'x': 6, 'y': 9}}
+[2026-05-20 14:04:19.593] [A1] move({'direction': 'north'}) → {'success': True, 'position': {'x': 13, 'y': 1}}
+[2026-05-20 14:04:20.073] [A3] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 1, 'west': 1}
+[2026-05-20 14:04:20.074] [A3] get_distance_to_exit({}) → {'steps': 33}
+[2026-05-20 14:04:20.614] [A1] get_surroundings({}) → {'north': 0, 'south': 2, 'east': 0, 'west': 3}
+[2026-05-20 14:04:20.614] [A1] get_distance_to_exit({}) → {'steps': 52}
+[2026-05-20 14:04:21.743] [A3] move({'direction': 'west'}) → {'success': True, 'position': {'x': 5, 'y': 9}}
+[2026-05-20 14:04:22.973] [A3] get_surroundings({}) → {'north': 3, 'south': 0, 'east': 2, 'west': 0}
+[2026-05-20 14:04:22.974] [A3] get_distance_to_exit({}) → {'steps': 32}
+[2026-05-20 14:04:23.994] [A1] move({'direction': 'south'}) → {'success': True, 'position': {'x': 13, 'y': 2}}
+[2026-05-20 14:04:24.432] [A3] move({'direction': 'north'}) → {'success': True, 'position': {'x': 5, 'y': 8}}
+[2026-05-20 14:04:25.078] [A1] get_surroundings({}) → {'north': 1, 'south': 1, 'east': 0, 'west': 0}
+[2026-05-20 14:04:25.079] [A1] get_distance_to_exit({}) → {'steps': 51}
+[2026-05-20 14:04:25.230] [A3] get_surroundings({}) → {'north': 3, 'south': 1, 'east': 0, 'west': 0}
+[2026-05-20 14:04:25.232] [A3] get_distance_to_exit({}) → {'steps': 31}
+[2026-05-20 14:04:26.149] [A1] move({'direction': 'south'}) → {'success': True, 'position': {'x': 13, 'y': 3}}
+[2026-05-20 14:04:26.708] [A3] move({'direction': 'north'}) → {'success': True, 'position': {'x': 5, 'y': 7}}
+[2026-05-20 14:04:27.236] [A1] get_surroundings({}) → {'north': 2, 'south': 0, 'east': 0, 'west': 2}
+[2026-05-20 14:04:27.238] [A1] get_distance_to_exit({}) → {'steps': 50}
+[2026-05-20 14:04:27.990] [A3] get_surroundings({}) → {'north': 2, 'south': 2, 'east': 0, 'west': 0}
+[2026-05-20 14:04:27.990] [A3] get_distance_to_exit({}) → {'steps': 30}
+[2026-05-20 14:04:29.224] [A3] move({'direction': 'north'}) → {'success': True, 'position': {'x': 5, 'y': 6}}
+[2026-05-20 14:04:29.425] [A1] move({'direction': 'west'}) → {'success': True, 'position': {'x': 12, 'y': 3}}
+[2026-05-20 14:04:30.195] [A3] get_surroundings({}) → {'north': 1, 'south': 3, 'east': 0, 'west': 0}
+[2026-05-20 14:04:30.195] [A3] get_distance_to_exit({}) → {'steps': 29}
+[2026-05-20 14:04:30.448] [A1] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 1, 'west': 1}
+[2026-05-20 14:04:30.449] [A1] get_distance_to_exit({}) → {'steps': 49}
+[2026-05-20 14:04:31.473] [A3] move({'direction': 'north'}) → {'success': True, 'position': {'x': 5, 'y': 5}}
+[2026-05-20 14:04:31.780] [A1] move({'direction': 'west'}) → {'success': True, 'position': {'x': 11, 'y': 3}}
+[2026-05-20 14:04:32.597] [A3] get_surroundings({}) → {'north': 0, 'south': 3, 'east': 0, 'west': 2}
+[2026-05-20 14:04:32.597] [A3] get_distance_to_exit({}) → {'steps': 28}
+[2026-05-20 14:04:32.977] [A1] get_surroundings({}) → {'north': 0, 'south': 2, 'east': 2, 'west': 0}
+[2026-05-20 14:04:32.978] [A1] get_distance_to_exit({}) → {'steps': 48}
+[2026-05-20 14:04:34.137] [A3] move({'direction': 'west'}) → {'success': True, 'position': {'x': 4, 'y': 5}}
+[2026-05-20 14:04:34.442] [A1] get_shared_memory({}) → {'agent_2': {'current': {'x': 13, 'y': 13}, 'visited': [{'x': 2, 'y': 13}, {'x': 3, 'y': 13}, {'x': 4, 'y': 13}, {'x': 5, 'y': 13}, {'x': 6, 'y': 13}, {'x': 7, 'y': 13}, {'x': 7, 'y': 12}, {'x': 7, 'y': 11}, {'x': 8, 'y': 11}, {'x': 9, 'y': 11}, {'x': 10, 'y': 11}, {'x': 11, 'y': 11}, {'x': 11, 'y': 12}, {'x': 11, 'y': 13}, {'x': 12, 'y': 13}, {'x': 13, 'y': 13}]}, 'agent_3': {'current': {'x': 4, 'y': 5}, 'visited': [{'x': 12, 'y': 1}, {'x': 11, 'y': 1}, {'x': 12, 'y': 1}, {'x': 13, 'y': 1}, {'x': 13, 'y': 2}, {'x': 13, 'y': 3}, {'x': 12, 'y': 3}, {'x': 11, 'y': 3}, {'x': 11, 'y': 4}, {'x': 11, 'y': 5}, {'x': 12, 'y': 5}, {'x': 13, 'y': 5}, {'x': 13, 'y': 6}, {'x': 13, 'y': 7}, {'x': 12, 'y': 7}, {'x': 11, 'y': 7}, {'x': 10, 'y': 7}, {'x': 9, 'y': 7}, {'x': 8, 'y': 7}, {'x': 7, 'y': 7}, {'x': 7, 'y': 8}, {'x': 7, 'y': 9}, {'x': 6, 'y': 9}, {'x': 5, 'y': 9}, {'x': 5, 'y': 8}, {'x': 5, 'y': 7}, {'x': 5, 'y': 6}, {'x': 5, 'y': 5}, {'x': 4, 'y': 5}]}}
+[2026-05-20 14:04:35.567] [A3] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 1, 'west': 1}
+[2026-05-20 14:04:35.568] [A3] get_distance_to_exit({}) → {'steps': 27}
+[2026-05-20 14:04:36.796] [A1] move({'direction': 'south'}) → {'success': True, 'position': {'x': 11, 'y': 4}}
+[2026-05-20 14:04:36.801] [A3] get_shared_memory({}) → {'agent_1': {'current': {'x': 11, 'y': 4}, 'visited': [{'x': 2, 'y': 1}, {'x': 3, 'y': 1}, {'x': 4, 'y': 1}, {'x': 5, 'y': 1}, {'x': 6, 'y': 1}, {'x': 7, 'y': 1}, {'x': 8, 'y': 1}, {'x': 9, 'y': 1}, {'x': 10, 'y': 1}, {'x': 11, 'y': 1}, {'x': 12, 'y': 1}, {'x': 13, 'y': 1}, {'x': 13, 'y': 2}, {'x': 13, 'y': 3}, {'x': 13, 'y': 2}, {'x': 13, 'y': 3}, {'x': 12, 'y': 3}, {'x': 13, 'y': 3}, {'x': 13, 'y': 2}, {'x': 13, 'y': 1}, {'x': 13, 'y': 2}, {'x': 13, 'y': 3}, {'x': 12, 'y': 3}, {'x': 11, 'y': 3}, {'x': 11, 'y': 4}]}, 'agent_2': {'current': {'x': 13, 'y': 13}, 'visited': [{'x': 2, 'y': 13}, {'x': 3, 'y': 13}, {'x': 4, 'y': 13}, {'x': 5, 'y': 13}, {'x': 6, 'y': 13}, {'x': 7, 'y': 13}, {'x': 7, 'y': 12}, {'x': 7, 'y': 11}, {'x': 8, 'y': 11}, {'x': 9, 'y': 11}, {'x': 10, 'y': 11}, {'x': 11, 'y': 11}, {'x': 11, 'y': 12}, {'x': 11, 'y': 13}, {'x': 12, 'y': 13}, {'x': 13, 'y': 13}]}}
+[2026-05-20 14:04:37.924] [A1] get_surroundings({}) → {'north': 1, 'south': 1, 'east': 0, 'west': 0}
+[2026-05-20 14:04:37.925] [A1] get_distance_to_exit({}) → {'steps': 47}
+[2026-05-20 14:04:38.537] [A3] move({'direction': 'west'}) → {'success': True, 'position': {'x': 3, 'y': 5}}
+[2026-05-20 14:04:39.152] [A1] move({'direction': 'south'}) → {'success': True, 'position': {'x': 11, 'y': 5}}
+[2026-05-20 14:04:39.563] [A3] get_surroundings({}) → {'north': 0, 'south': 3, 'east': 2, 'west': 0}
+[2026-05-20 14:04:39.564] [A3] get_distance_to_exit({}) → {'steps': 26}
+[2026-05-20 14:04:40.382] [A1] get_surroundings({}) → {'north': 2, 'south': 0, 'east': 2, 'west': 0}
+[2026-05-20 14:04:40.383] [A1] get_distance_to_exit({}) → {'steps': 46}
+[2026-05-20 14:04:40.791] [A3] get_shared_memory({}) → {'agent_1': {'current': {'x': 11, 'y': 5}, 'visited': [{'x': 2, 'y': 1}, {'x': 3, 'y': 1}, {'x': 4, 'y': 1}, {'x': 5, 'y': 1}, {'x': 6, 'y': 1}, {'x': 7, 'y': 1}, {'x': 8, 'y': 1}, {'x': 9, 'y': 1}, {'x': 10, 'y': 1}, {'x': 11, 'y': 1}, {'x': 12, 'y': 1}, {'x': 13, 'y': 1}, {'x': 13, 'y': 2}, {'x': 13, 'y': 3}, {'x': 13, 'y': 2}, {'x': 13, 'y': 3}, {'x': 12, 'y': 3}, {'x': 13, 'y': 3}, {'x': 13, 'y': 2}, {'x': 13, 'y': 1}, {'x': 13, 'y': 2}, {'x': 13, 'y': 3}, {'x': 12, 'y': 3}, {'x': 11, 'y': 3}, {'x': 11, 'y': 4}, {'x': 11, 'y': 5}]}, 'agent_2': {'current': {'x': 13, 'y': 13}, 'visited': [{'x': 2, 'y': 13}, {'x': 3, 'y': 13}, {'x': 4, 'y': 13}, {'x': 5, 'y': 13}, {'x': 6, 'y': 13}, {'x': 7, 'y': 13}, {'x': 7, 'y': 12}, {'x': 7, 'y': 11}, {'x': 8, 'y': 11}, {'x': 9, 'y': 11}, {'x': 10, 'y': 11}, {'x': 11, 'y': 11}, {'x': 11, 'y': 12}, {'x': 11, 'y': 13}, {'x': 12, 'y': 13}, {'x': 13, 'y': 13}]}}
+[2026-05-20 14:04:41.506] [A1] move({'direction': 'east'}) → {'success': True, 'position': {'x': 12, 'y': 5}}
+[2026-05-20 14:04:42.531] [A1] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 1, 'west': 1}
+[2026-05-20 14:04:42.532] [A1] get_distance_to_exit({}) → {'steps': 45}
+[2026-05-20 14:04:42.940] [A3] move({'direction': 'south'}) → {'success': True, 'position': {'x': 3, 'y': 6}}
+[2026-05-20 14:04:43.965] [A1] move({'direction': 'east'}) → {'success': True, 'position': {'x': 13, 'y': 5}}
+[2026-05-20 14:04:44.072] [A3] get_surroundings({}) → {'north': 1, 'south': 3, 'east': 0, 'west': 0}
+[2026-05-20 14:04:44.073] [A3] get_distance_to_exit({}) → {'steps': 25}
+[2026-05-20 14:04:45.193] [A1] get_surroundings({}) → {'north': 0, 'south': 2, 'east': 0, 'west': 2}
+[2026-05-20 14:04:45.193] [A1] get_distance_to_exit({}) → {'steps': 44}
+[2026-05-20 14:04:45.404] [A3] move({'direction': 'south'}) → {'success': True, 'position': {'x': 3, 'y': 7}}
+[2026-05-20 14:04:46.526] [A1] move({'direction': 'south'}) → {'success': True, 'position': {'x': 13, 'y': 6}}
+[2026-05-20 14:04:46.575] [A3] get_surroundings({}) → {'north': 2, 'south': 3, 'east': 0, 'west': 0}
+[2026-05-20 14:04:46.576] [A3] get_distance_to_exit({}) → {'steps': 24}
+[2026-05-20 14:04:47.651] [A1] get_surroundings({}) → {'north': 1, 'south': 1, 'east': 0, 'west': 0}
+[2026-05-20 14:04:47.652] [A1] get_distance_to_exit({}) → {'steps': 43}
+[2026-05-20 14:04:47.667] [A3] move({'direction': 'south'}) → {'success': True, 'position': {'x': 3, 'y': 8}}
+[2026-05-20 14:04:48.983] [A1] move({'direction': 'south'}) → {'success': True, 'position': {'x': 13, 'y': 7}}
+[2026-05-20 14:04:49.394] [A3] get_surroundings({}) → {'north': 3, 'south': 3, 'east': 0, 'west': 0}
+[2026-05-20 14:04:49.395] [A3] get_distance_to_exit({}) → {'steps': 23}
+[2026-05-20 14:04:50.012] [A1] get_surroundings({}) → {'north': 2, 'south': 0, 'east': 0, 'west': 3}
+[2026-05-20 14:04:50.013] [A1] get_distance_to_exit({}) → {'steps': 42}
+[2026-05-20 14:04:50.607] [A3] move({'direction': 'south'}) → {'success': True, 'position': {'x': 3, 'y': 9}}
+[2026-05-20 14:04:51.339] [A1] move({'direction': 'west'}) → {'success': True, 'position': {'x': 12, 'y': 7}}
+[2026-05-20 14:04:51.542] [A3] get_surroundings({}) → {'north': 3, 'south': 2, 'east': 0, 'west': 0}
+[2026-05-20 14:04:51.543] [A3] get_distance_to_exit({}) → {'steps': 22}
+[2026-05-20 14:04:52.462] [A1] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 1, 'west': 3}
+[2026-05-20 14:04:52.462] [A1] get_distance_to_exit({}) → {'steps': 41}
+[2026-05-20 14:04:52.671] [A3] move({'direction': 'south'}) → {'success': True, 'position': {'x': 3, 'y': 10}}
+[2026-05-20 14:04:53.655] [A3] get_surroundings({}) → {'north': 3, 'south': 1, 'east': 0, 'west': 0}
+[2026-05-20 14:04:53.655] [A3] get_distance_to_exit({}) → {'steps': 21}
+[2026-05-20 14:04:54.061] [A1] move({'direction': 'west'}) → {'success': True, 'position': {'x': 11, 'y': 7}}
+[2026-05-20 14:04:54.719] [A3] move({'direction': 'south'}) → {'success': True, 'position': {'x': 3, 'y': 11}}
+[2026-05-20 14:04:54.925] [A1] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 2, 'west': 3}
+[2026-05-20 14:04:54.926] [A1] get_distance_to_exit({}) → {'steps': 40}
+[2026-05-20 14:04:55.638] [A3] get_surroundings({}) → {'north': 3, 'south': 0, 'east': 0, 'west': 2}
+[2026-05-20 14:04:55.639] [A3] get_distance_to_exit({}) → {'steps': 20}
+[2026-05-20 14:04:56.248] [A1] move({'direction': 'west'}) → {'success': True, 'position': {'x': 10, 'y': 7}}
+[2026-05-20 14:04:57.071] [A3] get_shared_memory({}) → {'agent_1': {'current': {'x': 10, 'y': 7}, 'visited': [{'x': 2, 'y': 1}, {'x': 3, 'y': 1}, {'x': 4, 'y': 1}, {'x': 5, 'y': 1}, {'x': 6, 'y': 1}, {'x': 7, 'y': 1}, {'x': 8, 'y': 1}, {'x': 9, 'y': 1}, {'x': 10, 'y': 1}, {'x': 11, 'y': 1}, {'x': 12, 'y': 1}, {'x': 13, 'y': 1}, {'x': 13, 'y': 2}, {'x': 13, 'y': 3}, {'x': 13, 'y': 2}, {'x': 13, 'y': 3}, {'x': 12, 'y': 3}, {'x': 13, 'y': 3}, {'x': 13, 'y': 2}, {'x': 13, 'y': 1}, {'x': 13, 'y': 2}, {'x': 13, 'y': 3}, {'x': 12, 'y': 3}, {'x': 11, 'y': 3}, {'x': 11, 'y': 4}, {'x': 11, 'y': 5}, {'x': 12, 'y': 5}, {'x': 13, 'y': 5}, {'x': 13, 'y': 6}, {'x': 13, 'y': 7}, {'x': 12, 'y': 7}, {'x': 11, 'y': 7}, {'x': 10, 'y': 7}]}, 'agent_2': {'current': {'x': 13, 'y': 13}, 'visited': [{'x': 2, 'y': 13}, {'x': 3, 'y': 13}, {'x': 4, 'y': 13}, {'x': 5, 'y': 13}, {'x': 6, 'y': 13}, {'x': 7, 'y': 13}, {'x': 7, 'y': 12}, {'x': 7, 'y': 11}, {'x': 8, 'y': 11}, {'x': 9, 'y': 11}, {'x': 10, 'y': 11}, {'x': 11, 'y': 11}, {'x': 11, 'y': 12}, {'x': 11, 'y': 13}, {'x': 12, 'y': 13}, {'x': 13, 'y': 13}]}}
+[2026-05-20 14:04:57.396] [A1] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 3, 'west': 3}
+[2026-05-20 14:04:57.398] [A1] get_distance_to_exit({}) → {'steps': 39}
+[2026-05-20 14:04:58.506] [A3] move({'direction': 'west'}) → {'success': True, 'position': {'x': 2, 'y': 11}}
+[2026-05-20 14:04:58.759] [A1] move({'direction': 'west'}) → {'success': True, 'position': {'x': 9, 'y': 7}}
+[2026-05-20 14:04:59.839] [A3] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 1, 'west': 1}
+[2026-05-20 14:04:59.839] [A3] get_distance_to_exit({}) → {'steps': 19}
+[2026-05-20 14:04:59.844] [A1] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 3, 'west': 2}
+[2026-05-20 14:04:59.844] [A1] get_distance_to_exit({}) → {'steps': 38}
+[2026-05-20 14:05:00.860] [A1] move({'direction': 'west'}) → {'success': True, 'position': {'x': 8, 'y': 7}}
+[2026-05-20 14:05:01.068] [A3] move({'direction': 'west'}) → {'success': True, 'position': {'x': 1, 'y': 11}}
+[2026-05-20 14:05:01.985] [A1] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 3, 'west': 1}
+[2026-05-20 14:05:01.986] [A1] get_distance_to_exit({}) → {'steps': 37}
+[2026-05-20 14:05:02.395] [A3] get_surroundings({}) → {'north': 3, 'south': 2, 'east': 2, 'west': 0}
+[2026-05-20 14:05:02.396] [A3] get_distance_to_exit({}) → {'steps': 18}
+[2026-05-20 14:05:03.011] [A1] move({'direction': 'west'}) → {'success': True, 'position': {'x': 7, 'y': 7}}
+[2026-05-20 14:05:03.728] [A3] move({'direction': 'north'}) → {'success': True, 'position': {'x': 1, 'y': 10}}
+[2026-05-20 14:05:04.185] [A1] get_surroundings({}) → {'north': 0, 'south': 2, 'east': 3, 'west': 0}
+[2026-05-20 14:05:04.186] [A1] get_distance_to_exit({}) → {'steps': 36}
+[2026-05-20 14:05:05.060] [A3] get_surroundings({}) → {'north': 3, 'south': 3, 'east': 0, 'west': 0}
+[2026-05-20 14:05:05.060] [A3] get_distance_to_exit({}) → {'steps': 19}
+[2026-05-20 14:05:05.225] [A1] get_shared_memory({}) → {'agent_2': {'current': {'x': 13, 'y': 13}, 'visited': [{'x': 2, 'y': 13}, {'x': 3, 'y': 13}, {'x': 4, 'y': 13}, {'x': 5, 'y': 13}, {'x': 6, 'y': 13}, {'x': 7, 'y': 13}, {'x': 7, 'y': 12}, {'x': 7, 'y': 11}, {'x': 8, 'y': 11}, {'x': 9, 'y': 11}, {'x': 10, 'y': 11}, {'x': 11, 'y': 11}, {'x': 11, 'y': 12}, {'x': 11, 'y': 13}, {'x': 12, 'y': 13}, {'x': 13, 'y': 13}]}, 'agent_3': {'current': {'x': 1, 'y': 10}, 'visited': [{'x': 12, 'y': 1}, {'x': 11, 'y': 1}, {'x': 12, 'y': 1}, {'x': 13, 'y': 1}, {'x': 13, 'y': 2}, {'x': 13, 'y': 3}, {'x': 12, 'y': 3}, {'x': 11, 'y': 3}, {'x': 11, 'y': 4}, {'x': 11, 'y': 5}, {'x': 12, 'y': 5}, {'x': 13, 'y': 5}, {'x': 13, 'y': 6}, {'x': 13, 'y': 7}, {'x': 12, 'y': 7}, {'x': 11, 'y': 7}, {'x': 10, 'y': 7}, {'x': 9, 'y': 7}, {'x': 8, 'y': 7}, {'x': 7, 'y': 7}, {'x': 7, 'y': 8}, {'x': 7, 'y': 9}, {'x': 6, 'y': 9}, {'x': 5, 'y': 9}, {'x': 5, 'y': 8}, {'x': 5, 'y': 7}, {'x': 5, 'y': 6}, {'x': 5, 'y': 5}, {'x': 4, 'y': 5}, {'x': 3, 'y': 5}, {'x': 3, 'y': 6}, {'x': 3, 'y': 7}, {'x': 3, 'y': 8}, {'x': 3, 'y': 9}, {'x': 3, 'y': 10}, {'x': 3, 'y': 11}, {'x': 2, 'y': 11}, {'x': 1, 'y': 11}, {'x': 1, 'y': 10}]}}
+[2026-05-20 14:05:06.493] [A3] move({'direction': 'south'}) → {'success': True, 'position': {'x': 1, 'y': 11}}
+[2026-05-20 14:05:07.517] [A1] move({'direction': 'east'}) → {'success': True, 'position': {'x': 8, 'y': 7}}
+[2026-05-20 14:05:08.132] [A3] get_surroundings({}) → {'north': 3, 'south': 2, 'east': 2, 'west': 0}
+[2026-05-20 14:05:08.133] [A3] get_distance_to_exit({}) → {'steps': 18}
+[2026-05-20 14:05:08.848] [A1] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 3, 'west': 1}
+[2026-05-20 14:05:08.848] [A1] get_distance_to_exit({}) → {'steps': 37}
+[2026-05-20 14:05:09.665] [A3] move({'direction': 'south'}) → {'success': True, 'position': {'x': 1, 'y': 12}}
+[2026-05-20 14:05:10.171] [A1] move({'direction': 'west'}) → {'success': True, 'position': {'x': 7, 'y': 7}}
+[2026-05-20 14:05:10.793] [A3] get_surroundings({}) → {'north': 3, 'south': 1, 'east': 0, 'west': 0}
+[2026-05-20 14:05:10.793] [A3] get_distance_to_exit({}) → {'steps': 17}
+[2026-05-20 14:05:11.328] [A1] get_surroundings({}) → {'north': 0, 'south': 2, 'east': 3, 'west': 0}
+[2026-05-20 14:05:12.306] [A3] move({'direction': 'south'}) → {'success': True, 'position': {'x': 1, 'y': 13}}
+[2026-05-20 14:05:12.739] [A1] move({'direction': 'south'}) → {'success': True, 'position': {'x': 7, 'y': 8}}
+[2026-05-20 14:05:13.354] [A3] get_surroundings({}) → {'north': 3, 'south': 0, 'east': 3, 'west': 0}
+[2026-05-20 14:05:13.355] [A3] get_distance_to_exit({}) → {'steps': 16}
+[2026-05-20 14:05:14.071] [A1] get_surroundings({}) → {'north': 1, 'south': 1, 'east': 0, 'west': 0}
+[2026-05-20 14:05:14.071] [A1] get_distance_to_exit({}) → {'steps': 35}
+[2026-05-20 14:05:14.494] [A3] move({'direction': 'east'}) → {'success': True, 'position': {'x': 2, 'y': 13}}
+[2026-05-20 14:05:15.255] [A1] move({'direction': 'south'}) → {'success': True, 'position': {'x': 7, 'y': 9}}
+[2026-05-20 14:05:16.016] [A3] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 3, 'west': 1}
+[2026-05-20 14:05:16.016] [A3] get_distance_to_exit({}) → {'steps': 15}
+[2026-05-20 14:05:16.631] [A1] get_surroundings({}) → {'north': 2, 'south': 0, 'east': 0, 'west': 2}
+[2026-05-20 14:05:16.632] [A1] get_distance_to_exit({}) → {'steps': 34}
+[2026-05-20 14:05:17.449] [A3] move({'direction': 'east'}) → {'success': True, 'position': {'x': 3, 'y': 13}}
+[2026-05-20 14:05:18.167] [A1] get_shared_memory({}) → {'agent_2': {'current': {'x': 13, 'y': 13}, 'visited': [{'x': 2, 'y': 13}, {'x': 3, 'y': 13}, {'x': 4, 'y': 13}, {'x': 5, 'y': 13}, {'x': 6, 'y': 13}, {'x': 7, 'y': 13}, {'x': 7, 'y': 12}, {'x': 7, 'y': 11}, {'x': 8, 'y': 11}, {'x': 9, 'y': 11}, {'x': 10, 'y': 11}, {'x': 11, 'y': 11}, {'x': 11, 'y': 12}, {'x': 11, 'y': 13}, {'x': 12, 'y': 13}, {'x': 13, 'y': 13}]}, 'agent_3': {'current': {'x': 3, 'y': 13}, 'visited': [{'x': 12, 'y': 1}, {'x': 11, 'y': 1}, {'x': 12, 'y': 1}, {'x': 13, 'y': 1}, {'x': 13, 'y': 2}, {'x': 13, 'y': 3}, {'x': 12, 'y': 3}, {'x': 11, 'y': 3}, {'x': 11, 'y': 4}, {'x': 11, 'y': 5}, {'x': 12, 'y': 5}, {'x': 13, 'y': 5}, {'x': 13, 'y': 6}, {'x': 13, 'y': 7}, {'x': 12, 'y': 7}, {'x': 11, 'y': 7}, {'x': 10, 'y': 7}, {'x': 9, 'y': 7}, {'x': 8, 'y': 7}, {'x': 7, 'y': 7}, {'x': 7, 'y': 8}, {'x': 7, 'y': 9}, {'x': 6, 'y': 9}, {'x': 5, 'y': 9}, {'x': 5, 'y': 8}, {'x': 5, 'y': 7}, {'x': 5, 'y': 6}, {'x': 5, 'y': 5}, {'x': 4, 'y': 5}, {'x': 3, 'y': 5}, {'x': 3, 'y': 6}, {'x': 3, 'y': 7}, {'x': 3, 'y': 8}, {'x': 3, 'y': 9}, {'x': 3, 'y': 10}, {'x': 3, 'y': 11}, {'x': 2, 'y': 11}, {'x': 1, 'y': 11}, {'x': 1, 'y': 10}, {'x': 1, 'y': 11}, {'x': 1, 'y': 12}, {'x': 1, 'y': 13}, {'x': 2, 'y': 13}, {'x': 3, 'y': 13}]}}
+[2026-05-20 14:05:18.168] [A1] move({'direction': 'west'}) → {'success': True, 'position': {'x': 6, 'y': 9}}
+[2026-05-20 14:05:18.578] [A3] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 3, 'west': 2}
+[2026-05-20 14:05:18.579] [A3] get_distance_to_exit({}) → {'steps': 14}
+[2026-05-20 14:05:19.291] [A1] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 1, 'west': 1}
+[2026-05-20 14:05:19.291] [A1] get_distance_to_exit({}) → {'steps': 33}
+[2026-05-20 14:05:19.705] [A3] move({'direction': 'east'}) → {'success': True, 'position': {'x': 4, 'y': 13}}
+[2026-05-20 14:05:20.525] [A1] move({'direction': 'west'}) → {'success': True, 'position': {'x': 5, 'y': 9}}
+[2026-05-20 14:05:21.138] [A3] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 3, 'west': 3}
+[2026-05-20 14:05:21.138] [A3] get_distance_to_exit({}) → {'steps': 13}
+[2026-05-20 14:05:21.651] [A1] get_surroundings({}) → {'north': 3, 'south': 0, 'east': 2, 'west': 0}
+[2026-05-20 14:05:21.651] [A1] get_distance_to_exit({}) → {'steps': 32}
+[2026-05-20 14:05:22.364] [A3] move({'direction': 'east'}) → {'success': True, 'position': {'x': 5, 'y': 13}}
+[2026-05-20 14:05:23.595] [A3] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 2, 'west': 3}
+[2026-05-20 14:05:23.595] [A3] get_distance_to_exit({}) → {'steps': 12}
+[2026-05-20 14:05:23.902] [A1] move({'direction': 'north'}) → {'success': True, 'position': {'x': 5, 'y': 8}}
+[2026-05-20 14:05:25.065] [A3] move({'direction': 'east'}) → {'success': True, 'position': {'x': 6, 'y': 13}}
+[2026-05-20 14:05:25.136] [A1] get_surroundings({}) → {'north': 3, 'south': 1, 'east': 0, 'west': 0}
+[2026-05-20 14:05:25.137] [A1] get_distance_to_exit({}) → {'steps': 31}
+[2026-05-20 14:05:26.153] [A3] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 1, 'west': 3}
+[2026-05-20 14:05:26.153] [A3] get_distance_to_exit({}) → {'steps': 11}
+[2026-05-20 14:05:26.461] [A1] move({'direction': 'north'}) → {'success': True, 'position': {'x': 5, 'y': 7}}
+[2026-05-20 14:05:27.382] [A3] move({'direction': 'east'}) → {'success': True, 'position': {'x': 7, 'y': 13}}
+[2026-05-20 14:05:27.792] [A1] get_surroundings({}) → {'north': 2, 'south': 2, 'east': 0, 'west': 0}
+[2026-05-20 14:05:27.793] [A1] get_distance_to_exit({}) → {'steps': 30}
+[2026-05-20 14:05:28.608] [A3] get_surroundings({}) → {'north': 2, 'south': 0, 'east': 0, 'west': 3}
+[2026-05-20 14:05:28.608] [A3] get_distance_to_exit({}) → {'steps': 10}
+[2026-05-20 14:05:29.429] [A1] move({'direction': 'north'}) → {'success': True, 'position': {'x': 5, 'y': 6}}
+[2026-05-20 14:05:30.628] [A3] move({'direction': 'north'}) → {'success': True, 'position': {'x': 7, 'y': 12}}
+[2026-05-20 14:05:30.644] [A1] get_surroundings({}) → {'north': 1, 'south': 3, 'east': 0, 'west': 0}
+[2026-05-20 14:05:30.645] [A1] get_distance_to_exit({}) → {'steps': 29}
+[2026-05-20 14:05:31.784] [A3] get_surroundings({}) → {'north': 1, 'south': 1, 'east': 0, 'west': 0}
+[2026-05-20 14:05:31.784] [A3] get_distance_to_exit({}) → {'steps': 9}
+[2026-05-20 14:05:31.891] [A1] move({'direction': 'north'}) → {'success': True, 'position': {'x': 5, 'y': 5}}
+[2026-05-20 14:05:33.014] [A1] get_surroundings({}) → {'north': 0, 'south': 3, 'east': 0, 'west': 2}
+[2026-05-20 14:05:33.014] [A1] get_distance_to_exit({}) → {'steps': 28}
+[2026-05-20 14:05:33.221] [A3] move({'direction': 'north'}) → {'success': True, 'position': {'x': 7, 'y': 11}}
+[2026-05-20 14:05:34.551] [A3] get_surroundings({}) → {'north': 0, 'south': 2, 'east': 3, 'west': 2}
+[2026-05-20 14:05:34.551] [A3] get_distance_to_exit({}) → {'steps': 8}
+[2026-05-20 14:05:34.752] [A1] get_shared_memory({}) → {'agent_2': {'current': {'x': 13, 'y': 13}, 'visited': [{'x': 2, 'y': 13}, {'x': 3, 'y': 13}, {'x': 4, 'y': 13}, {'x': 5, 'y': 13}, {'x': 6, 'y': 13}, {'x': 7, 'y': 13}, {'x': 7, 'y': 12}, {'x': 7, 'y': 11}, {'x': 8, 'y': 11}, {'x': 9, 'y': 11}, {'x': 10, 'y': 11}, {'x': 11, 'y': 11}, {'x': 11, 'y': 12}, {'x': 11, 'y': 13}, {'x': 12, 'y': 13}, {'x': 13, 'y': 13}]}, 'agent_3': {'current': {'x': 7, 'y': 11}, 'visited': [{'x': 12, 'y': 1}, {'x': 11, 'y': 1}, {'x': 12, 'y': 1}, {'x': 13, 'y': 1}, {'x': 13, 'y': 2}, {'x': 13, 'y': 3}, {'x': 12, 'y': 3}, {'x': 11, 'y': 3}, {'x': 11, 'y': 4}, {'x': 11, 'y': 5}, {'x': 12, 'y': 5}, {'x': 13, 'y': 5}, {'x': 13, 'y': 6}, {'x': 13, 'y': 7}, {'x': 12, 'y': 7}, {'x': 11, 'y': 7}, {'x': 10, 'y': 7}, {'x': 9, 'y': 7}, {'x': 8, 'y': 7}, {'x': 7, 'y': 7}, {'x': 7, 'y': 8}, {'x': 7, 'y': 9}, {'x': 6, 'y': 9}, {'x': 5, 'y': 9}, {'x': 5, 'y': 8}, {'x': 5, 'y': 7}, {'x': 5, 'y': 6}, {'x': 5, 'y': 5}, {'x': 4, 'y': 5}, {'x': 3, 'y': 5}, {'x': 3, 'y': 6}, {'x': 3, 'y': 7}, {'x': 3, 'y': 8}, {'x': 3, 'y': 9}, {'x': 3, 'y': 10}, {'x': 3, 'y': 11}, {'x': 2, 'y': 11}, {'x': 1, 'y': 11}, {'x': 1, 'y': 10}, {'x': 1, 'y': 11}, {'x': 1, 'y': 12}, {'x': 1, 'y': 13}, {'x': 2, 'y': 13}, {'x': 3, 'y': 13}, {'x': 4, 'y': 13}, {'x': 5, 'y': 13}, {'x': 6, 'y': 13}, {'x': 7, 'y': 13}, {'x': 7, 'y': 12}, {'x': 7, 'y': 11}]}}
+[2026-05-20 14:05:35.985] [A3] get_shared_memory({}) → {'agent_1': {'current': {'x': 5, 'y': 5}, 'visited': [{'x': 2, 'y': 1}, {'x': 3, 'y': 1}, {'x': 4, 'y': 1}, {'x': 5, 'y': 1}, {'x': 6, 'y': 1}, {'x': 7, 'y': 1}, {'x': 8, 'y': 1}, {'x': 9, 'y': 1}, {'x': 10, 'y': 1}, {'x': 11, 'y': 1}, {'x': 12, 'y': 1}, {'x': 13, 'y': 1}, {'x': 13, 'y': 2}, {'x': 13, 'y': 3}, {'x': 13, 'y': 2}, {'x': 13, 'y': 3}, {'x': 12, 'y': 3}, {'x': 13, 'y': 3}, {'x': 13, 'y': 2}, {'x': 13, 'y': 1}, {'x': 13, 'y': 2}, {'x': 13, 'y': 3}, {'x': 12, 'y': 3}, {'x': 11, 'y': 3}, {'x': 11, 'y': 4}, {'x': 11, 'y': 5}, {'x': 12, 'y': 5}, {'x': 13, 'y': 5}, {'x': 13, 'y': 6}, {'x': 13, 'y': 7}, {'x': 12, 'y': 7}, {'x': 11, 'y': 7}, {'x': 10, 'y': 7}, {'x': 9, 'y': 7}, {'x': 8, 'y': 7}, {'x': 7, 'y': 7}, {'x': 8, 'y': 7}, {'x': 7, 'y': 7}, {'x': 7, 'y': 8}, {'x': 7, 'y': 9}, {'x': 6, 'y': 9}, {'x': 5, 'y': 9}, {'x': 5, 'y': 8}, {'x': 5, 'y': 7}, {'x': 5, 'y': 6}, {'x': 5, 'y': 5}]}, 'agent_2': {'current': {'x': 13, 'y': 13}, 'visited': [{'x': 2, 'y': 13}, {'x': 3, 'y': 13}, {'x': 4, 'y': 13}, {'x': 5, 'y': 13}, {'x': 6, 'y': 13}, {'x': 7, 'y': 13}, {'x': 7, 'y': 12}, {'x': 7, 'y': 11}, {'x': 8, 'y': 11}, {'x': 9, 'y': 11}, {'x': 10, 'y': 11}, {'x': 11, 'y': 11}, {'x': 11, 'y': 12}, {'x': 11, 'y': 13}, {'x': 12, 'y': 13}, {'x': 13, 'y': 13}]}}
+[2026-05-20 14:05:37.419] [A1] move({'direction': 'south'}) → {'success': True, 'position': {'x': 5, 'y': 6}}
+[2026-05-20 14:05:37.828] [A3] move({'direction': 'east'}) → {'success': True, 'position': {'x': 8, 'y': 11}}
+[2026-05-20 14:05:39.060] [A3] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 3, 'west': 3}
+[2026-05-20 14:05:39.060] [A3] get_distance_to_exit({}) → {'steps': 7}
+[2026-05-20 14:05:39.841] [A1] get_surroundings({}) → {'north': 1, 'south': 3, 'east': 0, 'west': 0}
+[2026-05-20 14:05:40.447] [A3] move({'direction': 'east'}) → {'success': True, 'position': {'x': 9, 'y': 11}}
+[2026-05-20 14:05:41.208] [A1] move({'direction': 'south'}) → {'success': True, 'position': {'x': 5, 'y': 7}}
+[2026-05-20 14:05:41.806] [A3] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 2, 'west': 3}
+[2026-05-20 14:05:41.806] [A3] get_distance_to_exit({}) → {'steps': 6}
+[2026-05-20 14:05:42.845] [A3] move({'direction': 'east'}) → {'success': True, 'position': {'x': 10, 'y': 11}}
+[2026-05-20 14:05:43.256] [A1] get_surroundings({}) → {'north': 2, 'south': 2, 'east': 0, 'west': 0}
+[2026-05-20 14:05:43.256] [A1] get_distance_to_exit({}) → {'steps': 30}
+[2026-05-20 14:05:43.972] [A3] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 1, 'west': 3}
+[2026-05-20 14:05:43.972] [A3] get_distance_to_exit({}) → {'steps': 5}
+[2026-05-20 14:05:44.574] [A1] move({'direction': 'south'}) → {'success': True, 'position': {'x': 5, 'y': 8}}
+[2026-05-20 14:05:45.201] [A3] move({'direction': 'east'}) → {'success': True, 'position': {'x': 11, 'y': 11}}
+[2026-05-20 14:05:45.759] [A1] get_surroundings({}) → {'north': 3, 'south': 1, 'east': 0, 'west': 0}
+[2026-05-20 14:05:45.760] [A1] get_distance_to_exit({}) → {'steps': 31}
+[2026-05-20 14:05:46.229] [A3] get_surroundings({}) → {'north': 0, 'south': 2, 'east': 0, 'west': 3}
+[2026-05-20 14:05:46.229] [A3] get_distance_to_exit({}) → {'steps': 4}
+[2026-05-20 14:05:47.555] [A1] move({'direction': 'north'}) → {'success': True, 'position': {'x': 5, 'y': 7}}
+[2026-05-20 14:05:47.561] [A3] move({'direction': 'south'}) → {'success': True, 'position': {'x': 11, 'y': 12}}
+[2026-05-20 14:05:48.785] [A3] get_surroundings({}) → {'north': 1, 'south': 1, 'east': 0, 'west': 0}
+[2026-05-20 14:05:48.785] [A3] get_distance_to_exit({}) → {'steps': 3}
+[2026-05-20 14:05:48.804] [A1] get_surroundings({}) → {'north': 2, 'south': 2, 'east': 0, 'west': 0}
+[2026-05-20 14:05:50.423] [A3] move({'direction': 'south'}) → {'success': True, 'position': {'x': 11, 'y': 13}}
+[2026-05-20 14:05:50.497] [A1] get_distance_to_exit({}) → {'steps': 30}
+[2026-05-20 14:05:51.535] [A3] get_surroundings({}) → {'north': 2, 'south': 0, 'east': 2, 'west': 2}
+[2026-05-20 14:05:51.536] [A3] get_distance_to_exit({}) → {'steps': 2}
+[2026-05-20 14:05:52.458] [A1] move({'direction': 'north'}) → {'success': True, 'position': {'x': 5, 'y': 6}}
+[2026-05-20 14:05:53.493] [A3] move({'direction': 'east'}) → {'success': True, 'position': {'x': 12, 'y': 13}}
+[2026-05-20 14:05:53.524] [A1] get_surroundings({}) → {'north': 1, 'south': 3, 'east': 0, 'west': 0}
+[2026-05-20 14:05:53.524] [A1] get_distance_to_exit({}) → {'steps': 29}
+[2026-05-20 14:05:54.723] [A3] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 1, 'west': 3}
+[2026-05-20 14:05:54.723] [A3] get_distance_to_exit({}) → {'steps': 1}
+[2026-05-20 14:05:54.928] [A1] move({'direction': 'north'}) → {'success': True, 'position': {'x': 5, 'y': 5}}
+[2026-05-20 14:05:55.851] [A3] move({'direction': 'east'}) → {'success': True, 'position': {'x': 13, 'y': 13}}
+[2026-05-20 14:05:56.047] [A1] get_surroundings({}) → {'north': 0, 'south': 3, 'east': 0, 'west': 2}
+[2026-05-20 14:05:56.047] [A1] get_distance_to_exit({}) → {'steps': 28}
+[2026-05-20 14:05:57.382] [A1] move({'direction': 'west'}) → {'success': True, 'position': {'x': 4, 'y': 5}}
+[2026-05-20 14:05:58.422] [A1] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 1, 'west': 1}
+[2026-05-20 14:05:58.423] [A1] get_distance_to_exit({}) → {'steps': 27}
+[2026-05-20 14:05:59.844] [A1] move({'direction': 'west'}) → {'success': True, 'position': {'x': 3, 'y': 5}}
+[2026-05-20 14:06:01.482] [A1] get_surroundings({}) → {'north': 0, 'south': 3, 'east': 2, 'west': 0}
+[2026-05-20 14:06:01.483] [A1] get_distance_to_exit({}) → {'steps': 26}
+[2026-05-20 14:06:03.424] [A1] move({'direction': 'south'}) → {'success': True, 'position': {'x': 3, 'y': 6}}
+[2026-05-20 14:06:04.554] [A1] get_surroundings({}) → {'north': 1, 'south': 3, 'east': 0, 'west': 0}
+[2026-05-20 14:06:04.555] [A1] get_distance_to_exit({}) → {'steps': 25}
+[2026-05-20 14:06:05.781] [A1] move({'direction': 'south'}) → {'success': True, 'position': {'x': 3, 'y': 7}}
+[2026-05-20 14:06:07.115] [A1] get_surroundings({}) → {'north': 2, 'south': 3, 'east': 0, 'west': 0}
+[2026-05-20 14:06:07.116] [A1] get_distance_to_exit({}) → {'steps': 24}
+[2026-05-20 14:06:08.342] [A1] move({'direction': 'south'}) → {'success': True, 'position': {'x': 3, 'y': 8}}
+[2026-05-20 14:06:09.837] [A1] get_surroundings({}) → {'north': 3, 'south': 3, 'east': 0, 'west': 0}
+[2026-05-20 14:06:09.838] [A1] get_distance_to_exit({}) → {'steps': 23}
+[2026-05-20 14:06:11.110] [A1] move({'direction': 'south'}) → {'success': True, 'position': {'x': 3, 'y': 9}}
+[2026-05-20 14:06:12.410] [A1] get_surroundings({}) → {'north': 3, 'south': 2, 'east': 0, 'west': 0}
+[2026-05-20 14:06:12.410] [A1] get_distance_to_exit({}) → {'steps': 22}
+[2026-05-20 14:06:13.464] [A1] move({'direction': 'south'}) → {'success': True, 'position': {'x': 3, 'y': 10}}
+[2026-05-20 14:06:14.691] [A1] get_surroundings({}) → {'north': 3, 'south': 1, 'east': 0, 'west': 0}
+[2026-05-20 14:06:14.691] [A1] get_distance_to_exit({}) → {'steps': 21}
+[2026-05-20 14:06:15.760] [A1] move({'direction': 'south'}) → {'success': True, 'position': {'x': 3, 'y': 11}}
+[2026-05-20 14:06:16.945] [A1] get_surroundings({}) → {'north': 3, 'south': 0, 'east': 0, 'west': 2}
+[2026-05-20 14:06:16.946] [A1] get_distance_to_exit({}) → {'steps': 20}
+[2026-05-20 14:06:17.967] [A1] move({'direction': 'south'}) → {'success': False, 'position': {'x': 3, 'y': 11}, 'reason': 'wall'}
+[2026-05-20 14:06:19.298] [A1] move({'direction': 'west'}) → {'success': True, 'position': {'x': 2, 'y': 11}}
+[2026-05-20 14:06:20.426] [A1] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 1, 'west': 1}
+[2026-05-20 14:06:20.427] [A1] get_distance_to_exit({}) → {'steps': 19}
+[2026-05-20 14:06:21.654] [A1] move({'direction': 'west'}) → {'success': True, 'position': {'x': 1, 'y': 11}}
+[2026-05-20 14:06:22.983] [A1] get_surroundings({}) → {'north': 3, 'south': 2, 'east': 2, 'west': 0}
+[2026-05-20 14:06:22.983] [A1] get_distance_to_exit({}) → {'steps': 18}
+[2026-05-20 14:06:24.520] [A1] get_shared_memory({}) → {'agent_2': {'current': {'x': 13, 'y': 13}, 'visited': [{'x': 2, 'y': 13}, {'x': 3, 'y': 13}, {'x': 4, 'y': 13}, {'x': 5, 'y': 13}, {'x': 6, 'y': 13}, {'x': 7, 'y': 13}, {'x': 7, 'y': 12}, {'x': 7, 'y': 11}, {'x': 8, 'y': 11}, {'x': 9, 'y': 11}, {'x': 10, 'y': 11}, {'x': 11, 'y': 11}, {'x': 11, 'y': 12}, {'x': 11, 'y': 13}, {'x': 12, 'y': 13}, {'x': 13, 'y': 13}]}, 'agent_3': {'current': {'x': 13, 'y': 13}, 'visited': [{'x': 12, 'y': 1}, {'x': 11, 'y': 1}, {'x': 12, 'y': 1}, {'x': 13, 'y': 1}, {'x': 13, 'y': 2}, {'x': 13, 'y': 3}, {'x': 12, 'y': 3}, {'x': 11, 'y': 3}, {'x': 11, 'y': 4}, {'x': 11, 'y': 5}, {'x': 12, 'y': 5}, {'x': 13, 'y': 5}, {'x': 13, 'y': 6}, {'x': 13, 'y': 7}, {'x': 12, 'y': 7}, {'x': 11, 'y': 7}, {'x': 10, 'y': 7}, {'x': 9, 'y': 7}, {'x': 8, 'y': 7}, {'x': 7, 'y': 7}, {'x': 7, 'y': 8}, {'x': 7, 'y': 9}, {'x': 6, 'y': 9}, {'x': 5, 'y': 9}, {'x': 5, 'y': 8}, {'x': 5, 'y': 7}, {'x': 5, 'y': 6}, {'x': 5, 'y': 5}, {'x': 4, 'y': 5}, {'x': 3, 'y': 5}, {'x': 3, 'y': 6}, {'x': 3, 'y': 7}, {'x': 3, 'y': 8}, {'x': 3, 'y': 9}, {'x': 3, 'y': 10}, {'x': 3, 'y': 11}, {'x': 2, 'y': 11}, {'x': 1, 'y': 11}, {'x': 1, 'y': 10}, {'x': 1, 'y': 11}, {'x': 1, 'y': 12}, {'x': 1, 'y': 13}, {'x': 2, 'y': 13}, {'x': 3, 'y': 13}, {'x': 4, 'y': 13}, {'x': 5, 'y': 13}, {'x': 6, 'y': 13}, {'x': 7, 'y': 13}, {'x': 7, 'y': 12}, {'x': 7, 'y': 11}, {'x': 8, 'y': 11}, {'x': 9, 'y': 11}, {'x': 10, 'y': 11}, {'x': 11, 'y': 11}, {'x': 11, 'y': 12}, {'x': 11, 'y': 13}, {'x': 12, 'y': 13}, {'x': 13, 'y': 13}]}}
+[2026-05-20 14:06:28.004] [A1] move({'direction': 'south'}) → {'success': True, 'position': {'x': 1, 'y': 12}}
+[2026-05-20 14:06:29.023] [A1] get_surroundings({}) → {'north': 3, 'south': 1, 'east': 0, 'west': 0}
+[2026-05-20 14:06:29.023] [A1] get_distance_to_exit({}) → {'steps': 17}
+[2026-05-20 14:06:30.560] [A1] move({'direction': 'south'}) → {'success': True, 'position': {'x': 1, 'y': 13}}
+[2026-05-20 14:06:31.992] [A1] get_surroundings({}) → {'north': 3, 'south': 0, 'east': 3, 'west': 0}
+[2026-05-20 14:06:31.993] [A1] get_distance_to_exit({}) → {'steps': 16}
+[2026-05-20 14:06:33.325] [A1] move({'direction': 'east'}) → {'success': True, 'position': {'x': 2, 'y': 13}}
+[2026-05-20 14:06:34.556] [A1] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 3, 'west': 1}
+[2026-05-20 14:06:34.556] [A1] get_distance_to_exit({}) → {'steps': 15}
+[2026-05-20 14:06:35.889] [A1] move({'direction': 'east'}) → {'success': True, 'position': {'x': 3, 'y': 13}}
+[2026-05-20 14:06:37.219] [A1] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 3, 'west': 2}
+[2026-05-20 14:06:37.220] [A1] get_distance_to_exit({}) → {'steps': 14}
+[2026-05-20 14:06:38.346] [A1] move({'direction': 'east'}) → {'success': True, 'position': {'x': 4, 'y': 13}}
+[2026-05-20 14:06:39.777] [A1] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 3, 'west': 3}
+[2026-05-20 14:06:39.777] [A1] get_distance_to_exit({}) → {'steps': 13}
+[2026-05-20 14:06:40.885] [A1] move({'direction': 'east'}) → {'success': True, 'position': {'x': 5, 'y': 13}}
+[2026-05-20 14:06:41.931] [A1] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 2, 'west': 3}
+[2026-05-20 14:06:41.931] [A1] get_distance_to_exit({}) → {'steps': 12}
+[2026-05-20 14:06:43.058] [A1] move({'direction': 'east'}) → {'success': True, 'position': {'x': 6, 'y': 13}}
+[2026-05-20 14:06:43.977] [A1] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 1, 'west': 3}
+[2026-05-20 14:06:43.977] [A1] get_distance_to_exit({}) → {'steps': 11}
+[2026-05-20 14:06:45.309] [A1] move({'direction': 'east'}) → {'success': True, 'position': {'x': 7, 'y': 13}}
+[2026-05-20 14:06:46.540] [A1] get_surroundings({}) → {'north': 2, 'south': 0, 'east': 0, 'west': 3}
+[2026-05-20 14:06:46.540] [A1] get_distance_to_exit({}) → {'steps': 10}
+[2026-05-20 14:06:48.792] [A1] move({'direction': 'north'}) → {'success': True, 'position': {'x': 7, 'y': 12}}
+[2026-05-20 14:06:49.917] [A1] get_surroundings({}) → {'north': 1, 'south': 1, 'east': 0, 'west': 0}
+[2026-05-20 14:06:49.917] [A1] get_distance_to_exit({}) → {'steps': 9}
+[2026-05-20 14:06:51.557] [A1] move({'direction': 'north'}) → {'success': True, 'position': {'x': 7, 'y': 11}}
+[2026-05-20 14:06:52.687] [A1] get_surroundings({}) → {'north': 0, 'south': 2, 'east': 3, 'west': 2}
+[2026-05-20 14:06:52.687] [A1] get_distance_to_exit({}) → {'steps': 8}
+[2026-05-20 14:06:54.117] [A1] get_shared_memory({}) → {'agent_2': {'current': {'x': 13, 'y': 13}, 'visited': [{'x': 2, 'y': 13}, {'x': 3, 'y': 13}, {'x': 4, 'y': 13}, {'x': 5, 'y': 13}, {'x': 6, 'y': 13}, {'x': 7, 'y': 13}, {'x': 7, 'y': 12}, {'x': 7, 'y': 11}, {'x': 8, 'y': 11}, {'x': 9, 'y': 11}, {'x': 10, 'y': 11}, {'x': 11, 'y': 11}, {'x': 11, 'y': 12}, {'x': 11, 'y': 13}, {'x': 12, 'y': 13}, {'x': 13, 'y': 13}]}, 'agent_3': {'current': {'x': 13, 'y': 13}, 'visited': [{'x': 12, 'y': 1}, {'x': 11, 'y': 1}, {'x': 12, 'y': 1}, {'x': 13, 'y': 1}, {'x': 13, 'y': 2}, {'x': 13, 'y': 3}, {'x': 12, 'y': 3}, {'x': 11, 'y': 3}, {'x': 11, 'y': 4}, {'x': 11, 'y': 5}, {'x': 12, 'y': 5}, {'x': 13, 'y': 5}, {'x': 13, 'y': 6}, {'x': 13, 'y': 7}, {'x': 12, 'y': 7}, {'x': 11, 'y': 7}, {'x': 10, 'y': 7}, {'x': 9, 'y': 7}, {'x': 8, 'y': 7}, {'x': 7, 'y': 7}, {'x': 7, 'y': 8}, {'x': 7, 'y': 9}, {'x': 6, 'y': 9}, {'x': 5, 'y': 9}, {'x': 5, 'y': 8}, {'x': 5, 'y': 7}, {'x': 5, 'y': 6}, {'x': 5, 'y': 5}, {'x': 4, 'y': 5}, {'x': 3, 'y': 5}, {'x': 3, 'y': 6}, {'x': 3, 'y': 7}, {'x': 3, 'y': 8}, {'x': 3, 'y': 9}, {'x': 3, 'y': 10}, {'x': 3, 'y': 11}, {'x': 2, 'y': 11}, {'x': 1, 'y': 11}, {'x': 1, 'y': 10}, {'x': 1, 'y': 11}, {'x': 1, 'y': 12}, {'x': 1, 'y': 13}, {'x': 2, 'y': 13}, {'x': 3, 'y': 13}, {'x': 4, 'y': 13}, {'x': 5, 'y': 13}, {'x': 6, 'y': 13}, {'x': 7, 'y': 13}, {'x': 7, 'y': 12}, {'x': 7, 'y': 11}, {'x': 8, 'y': 11}, {'x': 9, 'y': 11}, {'x': 10, 'y': 11}, {'x': 11, 'y': 11}, {'x': 11, 'y': 12}, {'x': 11, 'y': 13}, {'x': 12, 'y': 13}, {'x': 13, 'y': 13}]}}
+[2026-05-20 14:06:57.599] [A1] move({'direction': 'south'}) → {'success': True, 'position': {'x': 7, 'y': 12}}
+[2026-05-20 14:07:00.030] [A1] move({'direction': 'west'}) → {'success': False, 'position': {'x': 7, 'y': 12}, 'reason': 'wall'}
+[2026-05-20 14:07:01.489] [A1] get_location({}) → {'x': 7, 'y': 12}
+[2026-05-20 14:07:01.489] [A1] get_surroundings({}) → {'north': 1, 'south': 1, 'east': 0, 'west': 0}
+[2026-05-20 14:07:01.490] [A1] get_distance_to_exit({}) → {'steps': 9}
+[2026-05-20 14:07:03.229] [A1] move({'direction': 'north'}) → {'success': True, 'position': {'x': 7, 'y': 11}}
+[2026-05-20 14:07:04.561] [A1] get_surroundings({}) → {'north': 0, 'south': 2, 'east': 3, 'west': 2}
+[2026-05-20 14:07:04.561] [A1] get_distance_to_exit({}) → {'steps': 8}
+[2026-05-20 14:07:06.097] [A1] move({'direction': 'east'}) → {'success': True, 'position': {'x': 8, 'y': 11}}
+[2026-05-20 14:07:07.209] [A1] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 3, 'west': 3}
+[2026-05-20 14:07:07.209] [A1] get_distance_to_exit({}) → {'steps': 7}
+[2026-05-20 14:07:08.555] [A1] move({'direction': 'east'}) → {'success': True, 'position': {'x': 9, 'y': 11}}
+[2026-05-20 14:07:09.714] [A1] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 2, 'west': 3}
+[2026-05-20 14:07:09.715] [A1] get_distance_to_exit({}) → {'steps': 6}
+[2026-05-20 14:07:11.116] [A1] move({'direction': 'east'}) → {'success': True, 'position': {'x': 10, 'y': 11}}
+[2026-05-20 14:07:12.242] [A1] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 1, 'west': 3}
+[2026-05-20 14:07:12.242] [A1] get_distance_to_exit({}) → {'steps': 5}
+[2026-05-20 14:07:13.571] [A1] move({'direction': 'east'}) → {'success': True, 'position': {'x': 11, 'y': 11}}
+[2026-05-20 14:07:14.698] [A1] get_surroundings({}) → {'north': 0, 'south': 2, 'east': 0, 'west': 3}
+[2026-05-20 14:07:14.698] [A1] get_distance_to_exit({}) → {'steps': 4}
+[2026-05-20 14:07:16.132] [A1] move({'direction': 'south'}) → {'success': True, 'position': {'x': 11, 'y': 12}}
+[2026-05-20 14:07:17.361] [A1] get_surroundings({}) → {'north': 1, 'south': 1, 'east': 0, 'west': 0}
+[2026-05-20 14:07:17.361] [A1] get_distance_to_exit({}) → {'steps': 3}
+[2026-05-20 14:07:18.487] [A1] move({'direction': 'south'}) → {'success': True, 'position': {'x': 11, 'y': 13}}
+[2026-05-20 14:07:19.900] [A1] get_surroundings({}) → {'north': 2, 'south': 0, 'east': 2, 'west': 2}
+[2026-05-20 14:07:19.901] [A1] get_distance_to_exit({}) → {'steps': 2}
+[2026-05-20 14:07:22.169] [A1] move({'direction': 'east'}) → {'success': True, 'position': {'x': 12, 'y': 13}}
+[2026-05-20 14:07:23.608] [A1] get_distance_to_exit({}) → {'steps': 1}
+[2026-05-20 14:07:23.608] [A1] get_surroundings({}) → {'north': 0, 'south': 0, 'east': 1, 'west': 3}
+[2026-05-20 14:07:24.840] [A1] move({'direction': 'east'}) → {'success': True, 'position': {'x': 13, 'y': 13}}

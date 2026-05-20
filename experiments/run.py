@@ -10,7 +10,8 @@ from src.scenarios.config import ModelConfig
 from src.db.client import SupabaseClient
 from src.viz.terminal import LiveMazeView
 
-RESULTS_DIR = Path("results")
+RESULTS_DIR    = Path("results/experiments")
+SHARED_MEM_DIR = Path("results/shared_memory")
 
 
 async def run_experiments(
@@ -25,7 +26,8 @@ async def run_experiments(
     if maze_ids is None:
         maze_ids = available_maze_ids()
 
-    RESULTS_DIR.mkdir(exist_ok=True)
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    SHARED_MEM_DIR.mkdir(parents=True, exist_ok=True)
 
     db = await SupabaseClient.connect() if save_to_db else None
 
@@ -53,6 +55,11 @@ async def run_experiments(
                         on_move = view.update
                         print()  # space before first render
 
+                    ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S")
+                    sm_log = None
+                    if scenario != "baseline":
+                        sm_log = SHARED_MEM_DIR / f"{scenario}_maze{maze_id}_run{run_number:02d}_{ts}.jsonl"
+
                     result = await run_scenario(
                         scenario=scenario,
                         maze=maze,
@@ -60,6 +67,7 @@ async def run_experiments(
                         run_number=run_number,
                         lookahead=lookahead,
                         on_move=on_move,
+                        shared_memory_log=sm_log,
                     )
                     result["maze_id"] = maze_id
 
@@ -67,7 +75,6 @@ async def run_experiments(
                         view.show_summary(result)
 
                     # Local JSON backup — always saved regardless of DB
-                    ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S")
                     fname = f"{scenario}_maze{maze_id}_run{run_number:02d}_{ts}.json"
                     (RESULTS_DIR / fname).write_text(json.dumps(result, default=str))
 
@@ -83,7 +90,7 @@ async def run_experiments(
 
     print(f"\nDone. {completed - failed}/{total} succeeded, {failed} failed.")
     if failed:
-        print("Check results/ folder for locally saved runs.")
+        print("Check results/experiments/ for locally saved runs.")
 
 
 def parse_args():

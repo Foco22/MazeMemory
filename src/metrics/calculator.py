@@ -68,4 +68,5 @@ class TokenConsumption:
             "estimated_cost_usd":       round(cost_usd, 6),
             "observer_tokens":          observer,
             "per_agent":                per_agent,
+            "_price":                   {"input": price_in, "output": price_out},
         }

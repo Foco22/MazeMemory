@@ -1,6 +1,7 @@
 import os
 from supabase._async.client import AsyncClient, create_client
 from dotenv import load_dotenv
+from src.metrics.calculator import TokenConsumption
 
 load_dotenv()
 
@@ -17,7 +18,32 @@ class SupabaseClient:
         )
         return cls(client)
 
+    async def run_exists(self, result: dict) -> bool:
+        resp = (
+            await self._client.table("experiments")
+            .select("id")
+            .eq("scenario",   result["scenario"])
+            .eq("maze_id",    result["maze_id"])
+            .eq("started_at", result["started_at"])
+            .execute()
+        )
+        return len(resp.data) > 0
+
     async def save_run(self, result: dict, maze_id: int) -> str:
+        tokens = TokenConsumption().compute(result)
+        price = tokens["_price"]
+
+        cost_prompt     = round(result["total_prompt_tokens"]     * price["input"]  / 1_000_000, 6)
+        cost_completion = round(result["total_completion_tokens"] * price["output"] / 1_000_000, 6)
+        cost_agents     = round(cost_prompt + cost_completion, 6)
+
+        obs = result["observer_tokens"]
+        cost_observer = round(
+            (obs["prompt_tokens"] * price["input"] + obs["completion_tokens"] * price["output"]) / 1_000_000, 6
+        ) if obs else None
+
+        cost_total = round(cost_agents + (cost_observer or 0), 6)
+
         exp_row = {
             "scenario":                   result["scenario"],
             "maze_id":                    maze_id,
@@ -32,8 +58,13 @@ class SupabaseClient:
             "total_prompt_tokens":        result["total_prompt_tokens"],
             "total_completion_tokens":    result["total_completion_tokens"],
             "total_tokens":               result["total_tokens"],
-            "observer_prompt_tokens":     result["observer_tokens"]["prompt_tokens"] if result["observer_tokens"] else None,
-            "observer_completion_tokens": result["observer_tokens"]["completion_tokens"] if result["observer_tokens"] else None,
+            "observer_prompt_tokens":     obs["prompt_tokens"]     if obs else None,
+            "observer_completion_tokens": obs["completion_tokens"] if obs else None,
+            "cost_prompt_usd":            cost_prompt,
+            "cost_completion_usd":        cost_completion,
+            "cost_agents_usd":            cost_agents,
+            "cost_observer_usd":          cost_observer,
+            "cost_total_usd":             cost_total,
         }
 
         exp_response = await self._client.table("experiments").insert(exp_row).execute()

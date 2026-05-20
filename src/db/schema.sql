@@ -16,7 +16,12 @@ CREATE TABLE experiments (
     total_completion_tokens INTEGER     NOT NULL,
     total_tokens            INTEGER     NOT NULL,
     observer_prompt_tokens     INTEGER,
-    observer_completion_tokens INTEGER
+    observer_completion_tokens INTEGER,
+    cost_prompt_usd            NUMERIC(12, 6),
+    cost_completion_usd        NUMERIC(12, 6),
+    cost_agents_usd            NUMERIC(12, 6),
+    cost_observer_usd          NUMERIC(12, 6),
+    cost_total_usd             NUMERIC(12, 6)
 );
 
 CREATE TABLE agent_runs (

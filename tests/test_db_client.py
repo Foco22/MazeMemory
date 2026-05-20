@@ -83,3 +83,33 @@ async def test_save_run_inserts_three_tables():
     assert "experiments" in table_calls
     assert "agent_runs" in table_calls
     assert "trajectories" in table_calls
+
+
+@pytest.mark.asyncio
+async def test_save_run_costs_calculated():
+    client = make_client()
+    await client.save_run(make_result(), maze_id=1)
+
+    row = client._client.table.return_value.insert.call_args_list[0][0][0]
+    # claude-sonnet-4-6: $3/M input, $15/M output
+    # 300 prompt → 300 * 3 / 1_000_000 = 0.0009
+    # 150 completion → 150 * 15 / 1_000_000 = 0.00225
+    assert row["cost_prompt_usd"]     == pytest.approx(0.0009,   rel=1e-4)
+    assert row["cost_completion_usd"] == pytest.approx(0.00225,  rel=1e-4)
+    assert row["cost_agents_usd"]     == pytest.approx(0.00315,  rel=1e-4)
+    assert row["cost_observer_usd"]   is None
+    assert row["cost_total_usd"]      == pytest.approx(0.00315,  rel=1e-4)
+
+
+@pytest.mark.asyncio
+async def test_save_run_costs_with_observer():
+    client = make_client()
+    result = make_result()
+    result["observer_tokens"] = {"prompt_tokens": 100, "completion_tokens": 50, "total_tokens": 150}
+
+    await client.save_run(result, maze_id=1)
+
+    row = client._client.table.return_value.insert.call_args_list[0][0][0]
+    # observer: 100 * 3/1M + 50 * 15/1M = 0.0003 + 0.00075 = 0.00105
+    assert row["cost_observer_usd"] == pytest.approx(0.00105, rel=1e-4)
+    assert row["cost_total_usd"]    == pytest.approx(0.00315 + 0.00105, rel=1e-4)

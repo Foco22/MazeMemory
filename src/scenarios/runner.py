@@ -23,8 +23,14 @@ async def run_scenario(
 
     shared_memory = SharedMemoryStore(log_path=shared_memory_log) if scenario != "baseline" else None
 
+    llm_kwargs = {}
+    if model_config.api_base:
+        llm_kwargs["api_base"] = model_config.api_base
+    if model_config.api_key:
+        llm_kwargs["api_key"] = model_config.api_key
+
     observer = (
-        ObserverAgent(maze, model_config.model, shared_memory)
+        ObserverAgent(maze, model_config.model, shared_memory, llm_kwargs=llm_kwargs)
         if scenario == "shared_memory_observer"
         else None
     )
@@ -39,6 +45,7 @@ async def run_scenario(
             shared_memory=shared_memory,
             observer=observer,
             on_move=on_move,
+            llm_kwargs=llm_kwargs,
         )
         for i in range(3)
     ]

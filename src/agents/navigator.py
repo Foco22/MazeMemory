@@ -31,11 +31,13 @@ class NavigatorAgent:
         shared_memory: SharedMemoryStore | None = None,
         observer=None,
         on_move=None,
+        llm_kwargs: dict | None = None,
     ):
         self.agent_id = agent_id
         self.maze = maze
         self.model = model
         self.lookahead = lookahead
+        self._llm_kwargs: dict = llm_kwargs or {}
         self.shared_memory = shared_memory
         self.observer = observer
         self.on_move = on_move
@@ -76,6 +78,7 @@ class NavigatorAgent:
                 model=self.model,
                 messages=compressed,
                 tools=tools,
+                **self._llm_kwargs,
             )
             self.prompt_tokens += response.usage.prompt_tokens
             self.completion_tokens += response.usage.completion_tokens
@@ -145,8 +148,18 @@ class NavigatorAgent:
         }
 
     async def _execute(self, tool_call) -> dict:
-        name = tool_call.function.name
+        raw_name = tool_call.function.name or ""
+        # normalize malformed names like "move(north)\n</parameter>"
+        import re as _re
+        clean = _re.split(r'[\(\n<]', raw_name)[0].strip()
+        name = clean if clean else raw_name
+
         args = json.loads(tool_call.function.arguments or "{}")
+        # if direction was embedded in the name (e.g. "move(north)"), extract it
+        if name == "move" and "direction" not in args:
+            m = _re.search(r'\((north|south|east|west)\)', raw_name, _re.IGNORECASE)
+            if m:
+                args["direction"] = m.group(1).lower()
 
         if name == "get_location":
             result = {"x": self.position[0], "y": self.position[1]}
@@ -174,7 +187,7 @@ class NavigatorAgent:
 
         _trace_filter = os.environ.get("TRACE_AGENT", "")
         if not _trace_filter or _trace_filter == self.agent_id:
-            with open("trace.log", "a") as f:
+            with open("trace.log", "a", encoding="utf-8") as f:
                 ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
                 print(f"[{ts}] [A{self.agent_id}] {name}({args}) → {result}", file=f, flush=True)
         return result

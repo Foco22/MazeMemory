@@ -6,6 +6,8 @@ class ModelConfig:
     provider: str  # "anthropic", "openai", "google"
     model: str     # LiteLLM model string used for API calls
     version: str   # human-readable version label for tracking
+    api_base: str | None = None
+    api_key: str | None = None
 
 
 # Ready-to-use configs

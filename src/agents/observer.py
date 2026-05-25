@@ -5,12 +5,13 @@ from src.agents.prompts import observer_system_prompt
 
 
 class ObserverAgent:
-    def __init__(self, maze: Maze, model: str, shared_memory: SharedMemoryStore):
+    def __init__(self, maze: Maze, model: str, shared_memory: SharedMemoryStore, llm_kwargs: dict | None = None):
         self.maze = maze
         self.model = model
         self.shared_memory = shared_memory
         self.prompt_tokens = 0
         self.completion_tokens = 0
+        self._llm_kwargs: dict = llm_kwargs or {}
 
     async def get_insight(self, requesting_agent_id: str, position: tuple[int, int]) -> str:
         trajectories = await self.shared_memory.get_all()
@@ -43,6 +44,7 @@ class ObserverAgent:
                 {"role": "system", "content": observer_system_prompt()},
                 {"role": "user", "content": user_message},
             ],
+            **self._llm_kwargs,
         )
 
         self.prompt_tokens += response.usage.prompt_tokens

@@ -26,6 +26,9 @@ python experiments/run.py --scenarios baseline --mazes 1 --n-runs 1 --model gpt-
 # Cheapest option (DeepSeek)
 python experiments/run.py --scenarios baseline --mazes 1 --n-runs 1 --model deepseek/deepseek-chat --provider deepseek --live --no-db
 
+# Local model via Ollama (free, no API key required)
+python -u experiments/run.py --scenarios baseline --mazes 1 --n-runs 1 --model openai/ZimaBlueAI/Qwen3.5-9B-DeepSeek-V4-Flash-GGUF:latest --provider ollama --api-base http://localhost:11434/v1 --api-key ollama --live --no-db
+
 # All options
 python experiments/run.py --help
 ```
@@ -45,12 +48,34 @@ Supported models (pass as `--model`):
 | `deepseek/deepseek-v3.2` | `deepseek` | $0.14 | $0.28 |
 | `deepseek/deepseek-reasoner` | `deepseek` | $0.435 | $0.87 |
 
+### Running locally with Ollama (free)
+
+[Ollama](https://ollama.com) lets you run models on your own machine at no cost. Models must support tool/function calling.
+
+1. Install Ollama and pull a model:
+   ```bash
+   ollama pull ZimaBlueAI/Qwen3.5-9B-DeepSeek-V4-Flash-GGUF
+   ```
+
+2. Run with `--api-base` pointing to the local Ollama server and `openai/` prefix on the model name:
+   ```bash
+   python -u experiments/run.py --scenarios baseline --mazes 1 --n-runs 1 --model openai/<model-name> --provider ollama --api-base http://localhost:11434/v1 --api-key ollama --live --no-db
+   ```
+
+Tested local models:
+
+| Model (Ollama name) | VRAM | Tool calling |
+|---|---|---|
+| `ZimaBlueAI/Qwen3.5-9B-DeepSeek-V4-Flash-GGUF` | ~6 GB | Good |
+
 Key flags:
 
 | Flag | Description |
 |---|---|
 | `--model` | LiteLLM model string (e.g. `gpt-4o`, `claude-sonnet-4-6`) |
-| `--provider` | Provider name (`openai`, `anthropic`) |
+| `--provider` | Provider name (`openai`, `anthropic`, `ollama`) |
+| `--api-base` | Custom API base URL (e.g. `http://localhost:11434/v1` for Ollama) |
+| `--api-key` | Custom API key (use `ollama` for local Ollama) |
 | `--scenarios` | One or more of `baseline`, `shared_memory`, `shared_memory_observer` |
 | `--mazes` | Maze IDs to run (default: all) |
 | `--n-runs` | Runs per scenario/maze combination (default: 20) |

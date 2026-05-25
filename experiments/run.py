@@ -1,6 +1,7 @@
 import asyncio
 import json
 import argparse
+import traceback
 from pathlib import Path
 from datetime import datetime, timezone
 
@@ -56,6 +57,11 @@ async def run_experiments(
                         print()  # space before first render
 
                     ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S")
+                    with open("trace.log", "a", encoding="utf-8") as f:
+                        f.write(f"\n{'='*60}\n")
+                        f.write(f"RUN START: scenario={scenario} maze={maze_id} run={run_number} model={model_config.model} ts={ts}\n")
+                        f.write(f"{'='*60}\n")
+
                     sm_log = None
                     if scenario != "baseline":
                         sm_log = SHARED_MEM_DIR / f"{scenario}_maze{maze_id}_run{run_number:02d}_{ts}.jsonl"
@@ -87,6 +93,7 @@ async def run_experiments(
                 except Exception as e:
                     failed += 1
                     print(f"FAILED — {e}")
+                    traceback.print_exc()
 
     print(f"\nDone. {completed - failed}/{total} succeeded, {failed} failed.")
     if failed:
@@ -98,6 +105,8 @@ def parse_args():
     parser.add_argument("--model",    default="claude-sonnet-4-6", help="LiteLLM model string")
     parser.add_argument("--provider", default="anthropic",          help="Provider name")
     parser.add_argument("--version",  default=None,                 help="Model version label (defaults to model)")
+    parser.add_argument("--api-base", default=None,                 help="Custom API base URL (e.g. for Ollama: http://localhost:11434/v1)")
+    parser.add_argument("--api-key",  default=None,                 help="Custom API key (use 'ollama' for local Ollama)")
     parser.add_argument("--scenarios", nargs="+", default=list(SCENARIOS), choices=list(SCENARIOS))
     parser.add_argument("--mazes",    nargs="+", type=int, default=None)
     parser.add_argument("--n-runs",   type=int, default=20)
@@ -120,6 +129,8 @@ if __name__ == "__main__":
         provider=args.provider,
         model=args.model,
         version=args.version or args.model,
+        api_base=args.api_base,
+        api_key=args.api_key,
     )
     loop = asyncio.new_event_loop()
     loop.set_exception_handler(_silence_ssl_shutdown)

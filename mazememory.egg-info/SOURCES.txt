@@ -33,4 +33,5 @@ tests/test_metrics.py
 tests/test_navigator_tools.py
 tests/test_runner.py
 tests/test_shared_memory.py
+tests/test_sync.py
 tests/test_terminal.py

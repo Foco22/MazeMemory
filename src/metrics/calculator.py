@@ -41,12 +41,20 @@ class TokenConsumption:
         model = run_result["model"]
         price = _PRICES.get(model, {"input": 0.0, "output": 0.0})
         price_in, price_out = price["input"], price["output"]
+        price_cache = price.get("cache_hit")
 
         prompt     = run_result["total_prompt_tokens"]
         completion = run_result["total_completion_tokens"]
         total      = run_result["total_tokens"]
 
-        cost_usd = (prompt * price_in + completion * price_out) / 1_000_000
+        cache_hit  = run_result.get("total_cache_hit_tokens")
+        cache_miss = run_result.get("total_cache_miss_tokens")
+
+        if price_cache is not None and cache_hit is not None and cache_miss is not None:
+            uncategorized = max(0, prompt - cache_hit - cache_miss)
+            cost_usd = (cache_hit * price_cache + (cache_miss + uncategorized) * price_in + completion * price_out) / 1_000_000
+        else:
+            cost_usd = (prompt * price_in + completion * price_out) / 1_000_000
 
         per_agent = [
             {

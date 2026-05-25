@@ -64,6 +64,10 @@ async def run_scenario(
 
     total_prompt = sum(r["prompt_tokens"] for r in agent_results)
     total_completion = sum(r["completion_tokens"] for r in agent_results)
+    raw_cache_hit = sum(r.get("cache_hit_tokens") or 0 for r in agent_results)
+    raw_cache_miss = sum(r.get("cache_miss_tokens") or 0 for r in agent_results)
+    total_cache_hit = raw_cache_hit or None
+    total_cache_miss = raw_cache_miss or None
     if observer_tokens:
         total_prompt += observer_tokens["prompt_tokens"]
         total_completion += observer_tokens["completion_tokens"]
@@ -84,4 +88,6 @@ async def run_scenario(
         "total_prompt_tokens": total_prompt,
         "total_completion_tokens": total_completion,
         "total_tokens": total_prompt + total_completion,
+        "total_cache_hit_tokens": total_cache_hit,
+        "total_cache_miss_tokens": total_cache_miss,
     }

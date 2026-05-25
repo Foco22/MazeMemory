@@ -23,8 +23,8 @@ python experiments/run.py
 # Single test run with live visualization
 python experiments/run.py --scenarios baseline --mazes 1 --n-runs 1 --model gpt-4o --provider openai --live --no-db
 
-# Cheapest option (DeepSeek)
-python experiments/run.py --scenarios baseline --mazes 1 --n-runs 1 --model deepseek/deepseek-chat --provider deepseek --live --no-db
+# DeepSeek V4 Flash (cheap, requires DEEPSEEK_API_KEY in .env)
+python -u experiments/run.py --scenarios baseline --mazes 1 --n-runs 1 --model deepseek/deepseek-chat --provider deepseek --live --no-db
 
 # Local model via Ollama (free, no API key required)
 python -u experiments/run.py --scenarios baseline --mazes 1 --n-runs 1 --model openai/ZimaBlueAI/Qwen3.5-9B-DeepSeek-V4-Flash-GGUF:latest --provider ollama --api-base http://localhost:11434/v1 --api-key ollama --live --no-db

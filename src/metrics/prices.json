@@ -5,8 +5,9 @@
   "gpt-4o-mini":               {"input": 0.15,  "output":  0.60},
   "gemini/gemini-2.0-flash":   {"input": 0.075, "output":  0.30},
   "gpt-5.5":                   {"input": 5.00,  "output": 30.00},
-  "deepseek/deepseek-chat":    {"input": 0.14,  "output":  0.28},
-  "deepseek/deepseek-v3":      {"input": 0.14,  "output":  0.28},
-  "deepseek/deepseek-v3.2":    {"input": 0.14,  "output":  0.28},
-  "deepseek/deepseek-reasoner":{"input": 0.435, "output":  0.87}
+  "deepseek/deepseek-chat":     {"input": 0.14,  "output":  0.28,  "cache_hit": 0.0028},
+  "deepseek/deepseek-v4-flash": {"input": 0.14,  "output":  0.28,  "cache_hit": 0.0028},
+  "deepseek/deepseek-v3":       {"input": 0.14,  "output":  0.28,  "cache_hit": 0.0028},
+  "deepseek/deepseek-v3.2":     {"input": 0.14,  "output":  0.28,  "cache_hit": 0.0028},
+  "deepseek/deepseek-reasoner": {"input": 0.435, "output":  0.87,  "cache_hit": 0.0043}
 }

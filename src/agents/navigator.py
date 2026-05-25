@@ -47,6 +47,8 @@ class NavigatorAgent:
         self.timestep = 0
         self.prompt_tokens = 0
         self.completion_tokens = 0
+        self.cache_hit_tokens = 0
+        self.cache_miss_tokens = 0
         self.trace: list[dict] = []
         self._action_step = 0
         self._context_messages = 0
@@ -82,6 +84,8 @@ class NavigatorAgent:
             )
             self.prompt_tokens += response.usage.prompt_tokens
             self.completion_tokens += response.usage.completion_tokens
+            self.cache_hit_tokens += getattr(response.usage, "prompt_cache_hit_tokens", None) or 0
+            self.cache_miss_tokens += getattr(response.usage, "prompt_cache_miss_tokens", None) or 0
             self._context_messages = len(messages)
             self._llm_turns += 1
 
@@ -142,6 +146,8 @@ class NavigatorAgent:
             "prompt_tokens": self.prompt_tokens,
             "completion_tokens": self.completion_tokens,
             "total_tokens": self.prompt_tokens + self.completion_tokens,
+            "cache_hit_tokens": self.cache_hit_tokens or None,
+            "cache_miss_tokens": self.cache_miss_tokens or None,
             "reached_exit": self.position == self.maze.exit_pos,
             "duration_seconds": round(duration, 3),
             "trace": self.trace,

@@ -118,12 +118,18 @@ class LiveMazeView:
         print(f"  {'Agent':<8} {'Steps':>6} {'Optimal':>8} {'Ratio':>7} {'Tokens':>8} {'Cost':>10}")
         print("  " + "·" * 55)
 
+        price = _PRICES.get(result["model"], {"input": 0.0, "output": 0.0})
+        price_hit = price.get("cache_hit", price["input"])
+
         for ag in result["agents"]:
             aid = ag["agent_id"]
             color = COLORS.get(aid, "")
             opt = opt_by_id[aid]
             ratio = f"{opt['ratio']:.2f}" if opt["ratio"] is not None else "N/A"
-            agent_cost = _cost(result["model"], ag["prompt_tokens"], ag["completion_tokens"])
+            hit = ag.get("cache_hit_tokens") or 0
+            miss = ag.get("cache_miss_tokens") or 0
+            uncategorized = max(0, ag["prompt_tokens"] - hit - miss)
+            agent_cost = (hit * price_hit + (miss + uncategorized) * price["input"] + ag["completion_tokens"] * price["output"]) / 1_000_000
             print(f"  {color}Agent {aid}{RESET}   "
                   f"{ag['steps']:>6}  "
                   f"{opt['optimal_steps'] or 'N/A':>7}  "

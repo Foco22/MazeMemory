@@ -6,6 +6,7 @@ from src.memory.shared import SharedMemoryStore
 from src.agents.navigator import NavigatorAgent
 from src.agents.observer import ObserverAgent
 from src.scenarios.config import ModelConfig
+from src.maze.pathfinding import optimal_steps as _optimal_steps
 
 SCENARIOS = ("baseline", "shared_memory", "shared_memory_observer")
 
@@ -53,6 +54,12 @@ async def run_scenario(
     started_at = datetime.now(timezone.utc).isoformat()
     agent_results = await asyncio.gather(*[a.run() for a in agents])
     completed_at = datetime.now(timezone.utc).isoformat()
+
+    for i, ar in enumerate(agent_results):
+        opt = _optimal_steps(maze, maze.start_positions[i], maze.exit_pos)
+        ratio = (ar["steps"] / opt) if opt and ar["reached_exit"] else None
+        ar["optimal_steps"] = opt
+        ar["optimality_ratio"] = round(ratio, 4) if ratio is not None else None
 
     observer_tokens = None
     if observer:

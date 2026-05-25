@@ -15,6 +15,8 @@ CREATE TABLE experiments (
     total_prompt_tokens     INTEGER     NOT NULL,
     total_completion_tokens INTEGER     NOT NULL,
     total_tokens            INTEGER     NOT NULL,
+    total_cache_hit_tokens  INTEGER,
+    total_cache_miss_tokens INTEGER,
     observer_prompt_tokens     INTEGER,
     observer_completion_tokens INTEGER,
     cost_prompt_usd            NUMERIC(12, 6),
@@ -28,11 +30,15 @@ CREATE TABLE experiments (
 CREATE TABLE agent_runs (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     experiment_id   UUID    NOT NULL REFERENCES experiments(id) ON DELETE CASCADE,
-    agent_id        TEXT    NOT NULL,
-    steps           INTEGER NOT NULL,
-    prompt_tokens   INTEGER NOT NULL,
+    agent_id          TEXT    NOT NULL,
+    steps             INTEGER NOT NULL,
+    optimal_steps     INTEGER,
+    optimality_ratio  NUMERIC(8, 4),
+    prompt_tokens     INTEGER NOT NULL,
     completion_tokens INTEGER NOT NULL,
-    total_tokens    INTEGER NOT NULL,
+    total_tokens      INTEGER NOT NULL,
+    cache_hit_tokens  INTEGER,
+    cache_miss_tokens INTEGER,
     reached_exit      BOOLEAN NOT NULL,
     duration_seconds  NUMERIC(10, 3)
 );

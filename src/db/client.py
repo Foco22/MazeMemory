@@ -33,14 +33,23 @@ class SupabaseClient:
     async def save_run(self, result: dict, maze_id: int) -> str:
         tokens = TokenConsumption().compute(result)
         price = tokens["_price"]
+        price_in   = price["input"]
+        price_out  = price["output"]
+        price_hit  = price.get("cache_hit", price_in)
 
-        cost_prompt     = round(result["total_prompt_tokens"]     * price["input"]  / 1_000_000, 6)
-        cost_completion = round(result["total_completion_tokens"] * price["output"] / 1_000_000, 6)
-        cost_agents     = round(cost_prompt + cost_completion, 6)
+        def _cost_with_cache(prompt, completion, cache_hit, cache_miss):
+            uncategorized = max(0, prompt - (cache_hit or 0) - (cache_miss or 0))
+            return round(
+                ((cache_hit or 0) * price_hit + (cache_miss or 0 + uncategorized) * price_in + completion * price_out) / 1_000_000, 6
+            )
+
+        cost_prompt     = round(tokens["estimated_cost_usd"] - result["total_completion_tokens"] * price_out / 1_000_000, 6)
+        cost_completion = round(result["total_completion_tokens"] * price_out / 1_000_000, 6)
+        cost_agents     = round(tokens["estimated_cost_usd"], 6)
 
         obs = result["observer_tokens"]
         cost_observer = round(
-            (obs["prompt_tokens"] * price["input"] + obs["completion_tokens"] * price["output"]) / 1_000_000, 6
+            (obs["prompt_tokens"] * price_in + obs["completion_tokens"] * price_out) / 1_000_000, 6
         ) if obs else None
 
         cost_total = round(cost_agents + (cost_observer or 0), 6)
@@ -63,6 +72,8 @@ class SupabaseClient:
             "total_prompt_tokens":        result["total_prompt_tokens"],
             "total_completion_tokens":    result["total_completion_tokens"],
             "total_tokens":               result["total_tokens"],
+            "total_cache_hit_tokens":     result.get("total_cache_hit_tokens"),
+            "total_cache_miss_tokens":    result.get("total_cache_miss_tokens"),
             "observer_prompt_tokens":     obs["prompt_tokens"]     if obs else None,
             "observer_completion_tokens": obs["completion_tokens"] if obs else None,
             "cost_prompt_usd":            cost_prompt,
@@ -81,9 +92,13 @@ class SupabaseClient:
                 "experiment_id":    experiment_id,
                 "agent_id":         a["agent_id"],
                 "steps":            a["steps"],
+                "optimal_steps":    a.get("optimal_steps"),
+                "optimality_ratio": a.get("optimality_ratio"),
                 "prompt_tokens":    a["prompt_tokens"],
                 "completion_tokens": a["completion_tokens"],
                 "total_tokens":     a["total_tokens"],
+                "cache_hit_tokens": a.get("cache_hit_tokens"),
+                "cache_miss_tokens": a.get("cache_miss_tokens"),
                 "reached_exit":     a["reached_exit"],
                 "duration_seconds": a.get("duration_seconds"),
             }

@@ -1,7 +1,7 @@
 import pytest
 from src.maze.generator import generate_maze
 from src.maze.pathfinding import astar
-from src.metrics.calculator import PathOptimalityRatio, TokenConsumption
+from src.metrics.calculator import PathOptimalityRatio, TokenConsumption, RedundantComputationReduction
 
 
 @pytest.fixture
@@ -102,3 +102,76 @@ class TestTokenConsumption:
         obs = {"prompt_tokens": 50, "completion_tokens": 20, "total_tokens": 70}
         result = TokenConsumption().compute(self.make_run_result(observer_tokens=obs))
         assert result["observer_tokens"]["total_tokens"] == 70
+
+
+class TestRedundantComputationReduction:
+    def make_run(self, agents):
+        return {"agents": agents}
+
+    def test_no_exit_reached_returns_none_ratio(self, maze):
+        agents = [
+            make_agent_result(str(i + 1), [maze.start_positions[i]], reached_exit=False)
+            for i in range(3)
+        ]
+        results = RedundantComputationReduction(maze).compute(self.make_run(agents))
+        assert all(r["ratio"] is None for r in results)
+        assert all(r["t_first_exit"] is None for r in results)
+
+    def test_first_exit_agent_has_zero_redundancy(self, maze):
+        # Agent 2's optimal path (16 steps) is the shortest — it exits first.
+        paths = [astar(maze, maze.start_positions[i], maze.exit_pos) for i in range(3)]
+        agents = [make_agent_result(str(i + 1), paths[i]) for i in range(3)]
+        results = RedundantComputationReduction(maze).compute(self.make_run(agents))
+
+        a2 = next(r for r in results if r["agent_id"] == "2")
+        assert a2["redundant_cells"] == 0
+        assert a2["ratio"] == 0.0
+
+    def test_redundancy_matches_manual_computation(self, maze):
+        """Verify the formula: post-exit cells ∩ other_agents − optimal_set."""
+        paths = [astar(maze, maze.start_positions[i], maze.exit_pos) for i in range(3)]
+        agents = [make_agent_result(str(i + 1), paths[i]) for i in range(3)]
+        t = min(a["steps"] for a in agents)  # 16
+
+        # Manual computation for agent 1
+        path1 = paths[0]
+        pos_at_t = path1[min(t, len(path1) - 1)]
+        optimal_set = set(astar(maze, pos_at_t, maze.exit_pos))
+        other_cells = {c for i, p in enumerate(paths) if i != 0 for c in p}
+        post_exit = path1[t + 1:]
+        expected_redundant = len({c for c in post_exit if c in other_cells and c not in optimal_set})
+
+        results = RedundantComputationReduction(maze).compute(self.make_run(agents))
+        a1 = next(r for r in results if r["agent_id"] == "1")
+
+        assert a1["redundant_cells"] == expected_redundant
+        assert a1["t_first_exit"] == t
+        assert a1["pos_at_first_exit"] == list(pos_at_t)
+
+    def test_pre_exit_cells_excluded(self, maze):
+        """Cells shared before T_first_exit must not inflate the redundancy count."""
+        paths = [astar(maze, maze.start_positions[i], maze.exit_pos) for i in range(3)]
+        agents = [make_agent_result(str(i + 1), paths[i]) for i in range(3)]
+        t = min(a["steps"] for a in agents)  # 16
+
+        results = RedundantComputationReduction(maze).compute(self.make_run(agents))
+        a1 = next(r for r in results if r["agent_id"] == "1")
+
+        # Build an upper bound that would include pre-exit overlaps (wrong behaviour)
+        path1 = paths[0]
+        pos_at_t = path1[min(t, len(path1) - 1)]
+        optimal_set = set(astar(maze, pos_at_t, maze.exit_pos))
+        other_cells = {c for i, p in enumerate(paths) if i != 0 for c in p}
+
+        # Wrongly counting ALL (not just post-exit) overlapping non-optimal cells
+        inflated = len({c for c in set(path1) if c in other_cells and c not in optimal_set})
+
+        # The correct count must not exceed the inflated upper bound,
+        # and if there are pre-exit overlaps it must be strictly less.
+        pre_exit_overlap_not_optimal = {
+            c for c in set(path1[: t + 1]) if c in other_cells and c not in optimal_set
+        }
+        if pre_exit_overlap_not_optimal:
+            assert a1["redundant_cells"] < inflated
+        else:
+            assert a1["redundant_cells"] <= inflated

@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 from src.maze.generator import Maze
-from src.maze.pathfinding import optimal_steps
+from src.maze.pathfinding import optimal_steps, astar
 
 _PRICES_PATH = Path(__file__).parent / "prices.json"
 with _PRICES_PATH.open() as f:
@@ -78,3 +78,70 @@ class TokenConsumption:
             "per_agent":                per_agent,
             "_price":                   {"input": price_in, "output": price_out},
         }
+
+
+class RedundantComputationReduction:
+    """
+    Measures how much work agents duplicate after the first exit is found.
+
+    For each agent i:
+      redundant_cells = cells visited after T_first_exit that were already
+                        visited by another agent AND are not on agent i's
+                        optimal A* path from its position at T_first_exit.
+      ratio = redundant_cells / total_unique_cells_visited_by_agent_i
+
+    Exploration before T_first_exit is never penalised.
+    """
+
+    def __init__(self, maze: Maze):
+        self.maze = maze
+
+    def compute(self, run_result: dict) -> list[dict]:
+        agents = run_result["agents"]
+
+        exit_steps = [a["steps"] for a in agents if a["reached_exit"]]
+        if not exit_steps:
+            return [
+                {
+                    "agent_id": a["agent_id"],
+                    "redundant_cells": 0,
+                    "total_cells_visited": len({tuple(p) for p in a["path"]}),
+                    "ratio": None,
+                    "t_first_exit": None,
+                }
+                for a in agents
+            ]
+
+        t_first_exit = min(exit_steps)
+        results = []
+
+        for agent in agents:
+            path = [tuple(p) for p in agent["path"]]
+            agent_id = agent["agent_id"]
+
+            other_cells: set[tuple] = set()
+            for other in agents:
+                if other["agent_id"] != agent_id:
+                    other_cells.update(tuple(p) for p in other["path"])
+
+            idx = min(t_first_exit, len(path) - 1)
+            pos_at_first_exit = path[idx]
+
+            optimal_set = set(astar(self.maze, pos_at_first_exit, self.maze.exit_pos))
+
+            post_exit = path[t_first_exit + 1:]
+            redundant = {c for c in post_exit if c in other_cells and c not in optimal_set}
+
+            total_cells = len(set(path))
+            n_redundant = len(redundant)
+
+            results.append({
+                "agent_id": agent_id,
+                "redundant_cells": n_redundant,
+                "total_cells_visited": total_cells,
+                "ratio": round(n_redundant / total_cells, 4) if total_cells > 0 else None,
+                "t_first_exit": t_first_exit,
+                "pos_at_first_exit": list(pos_at_first_exit),
+            })
+
+        return results

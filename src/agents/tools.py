@@ -18,9 +18,9 @@ def build_insight_tool() -> dict:
         "function": {
             "name": "get_insight",
             "description": (
-                "Ask the Observer agent to analyse all agents' trajectories and return "
-                "a movement recommendation tailored to your current position. "
-                "Use when unsure which direction to take."
+                "Ask the Observer agent for a navigation report. Returns a 4-section report: "
+                "map analysis, distance analysis, agent status, and a specific direction recommendation. "
+                "Call this every time it becomes available — do not skip it."
             ),
             "parameters": {"type": "object", "properties": {}, "required": []},
         },

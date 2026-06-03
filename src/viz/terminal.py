@@ -4,7 +4,7 @@ import json
 import sys
 from pathlib import Path
 from src.maze.generator import Maze
-from src.metrics.calculator import PathOptimalityRatio, TokenConsumption
+from src.metrics.calculator import PathOptimalityRatio, TokenConsumption, RedundantComputationReduction
 
 _PRICES_PATH = Path(__file__).parent.parent / "metrics" / "prices.json"
 with _PRICES_PATH.open() as _f:
@@ -107,36 +107,41 @@ class LiveMazeView:
         _exit_alt_screen()
         atexit.unregister(_exit_alt_screen)
 
-        optimality = PathOptimalityRatio(self.maze).compute_all(result)
-        tokens = TokenConsumption().compute(result)
+        optimality  = PathOptimalityRatio(self.maze).compute_all(result)
+        tokens      = TokenConsumption().compute(result)
+        redundancy  = RedundantComputationReduction(self.maze).compute(result)
 
-        opt_by_id = {r["agent_id"]: r for r in optimality}
+        opt_by_id  = {r["agent_id"]: r for r in optimality}
+        redu_by_id = {r["agent_id"]: r for r in redundancy}
 
-        print("\n" + "─" * 52)
+        print("\n" + "─" * 64)
         print(f"  {BOLD}RUN SUMMARY{RESET}  {result['scenario']}  maze={result['maze_id']}")
-        print("─" * 52)
-        print(f"  {'Agent':<8} {'Steps':>6} {'Optimal':>8} {'Ratio':>7} {'Tokens':>8} {'Cost':>10}")
-        print("  " + "·" * 55)
+        print("─" * 64)
+        print(f"  {'Agent':<8} {'Steps':>6} {'Optimal':>8} {'Ratio':>7} {'Redund.':>8} {'Tokens':>8} {'Cost':>10}")
+        print("  " + "·" * 67)
 
-        price = _PRICES.get(result["model"], {"input": 0.0, "output": 0.0})
+        price    = _PRICES.get(result["model"], {"input": 0.0, "output": 0.0})
         price_hit = price.get("cache_hit", price["input"])
 
         for ag in result["agents"]:
-            aid = ag["agent_id"]
+            aid   = ag["agent_id"]
             color = COLORS.get(aid, "")
-            opt = opt_by_id[aid]
-            ratio = f"{opt['ratio']:.2f}" if opt["ratio"] is not None else "N/A"
-            hit = ag.get("cache_hit_tokens") or 0
-            miss = ag.get("cache_miss_tokens") or 0
+            opt   = opt_by_id[aid]
+            redu  = redu_by_id.get(aid, {})
+            ratio = f"{opt['ratio']:.2f}"   if opt["ratio"]        is not None else "N/A"
+            redun = f"{redu['ratio']:.2f}"  if redu.get("ratio")   is not None else "N/A"
+            hit          = ag.get("cache_hit_tokens") or 0
+            miss         = ag.get("cache_miss_tokens") or 0
             uncategorized = max(0, ag["prompt_tokens"] - hit - miss)
-            agent_cost = (hit * price_hit + (miss + uncategorized) * price["input"] + ag["completion_tokens"] * price["output"]) / 1_000_000
+            agent_cost   = (hit * price_hit + (miss + uncategorized) * price["input"] + ag["completion_tokens"] * price["output"]) / 1_000_000
             print(f"  {color}Agent {aid}{RESET}   "
                   f"{ag['steps']:>6}  "
                   f"{opt['optimal_steps'] or 'N/A':>7}  "
                   f"{ratio:>7}  "
+                  f"{redun:>8}  "
                   f"{ag['total_tokens']:>7}  "
                   f"${agent_cost:.5f}")
 
-        print("  " + "·" * 55)
-        print(f"  {'TOTAL':<8} {'':>6} {'':>8} {'':>7} {tokens['total_tokens']:>8}  ${tokens['estimated_cost_usd']:.5f}")
-        print("─" * 52 + "\n")
+        print("  " + "·" * 67)
+        print(f"  {'TOTAL':<8} {'':>6} {'':>8} {'':>7} {'':>8} {tokens['total_tokens']:>8}  ${tokens['estimated_cost_usd']:.5f}")
+        print("─" * 64 + "\n")

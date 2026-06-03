@@ -10,9 +10,11 @@ from src.scenarios.runner import run_scenario, SCENARIOS
 from src.scenarios.config import ModelConfig
 from src.db.client import SupabaseClient
 from src.viz.terminal import LiveMazeView
+from src.viz.video import render_run_video
 
 RESULTS_DIR    = Path("results/experiments")
 SHARED_MEM_DIR = Path("results/shared_memory")
+VIDEOS_DIR     = Path("results/videos")
 
 
 async def run_experiments(
@@ -23,12 +25,18 @@ async def run_experiments(
     lookahead: int = 3,
     save_to_db: bool = True,
     live: bool = False,
+    save_video: bool = True,
 ) -> None:
     if maze_ids is None:
         maze_ids = available_maze_ids()
 
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     SHARED_MEM_DIR.mkdir(parents=True, exist_ok=True)
+
+    batch_ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S")
+    videos_folder = VIDEOS_DIR / batch_ts
+    if save_video:
+        videos_folder.mkdir(parents=True, exist_ok=True)
 
     db = await SupabaseClient.connect() if save_to_db else None
 
@@ -84,6 +92,10 @@ async def run_experiments(
                     fname = f"{scenario}_maze{maze_id}_run{run_number:02d}_{ts}.json"
                     (RESULTS_DIR / fname).write_text(json.dumps(result, default=str))
 
+                    if save_video:
+                        gif_name = f"{scenario}_maze{maze_id}_run{run_number:02d}.gif"
+                        render_run_video(maze, result, videos_folder / gif_name)
+
                     if db:
                         experiment_id = await db.save_run(result, maze_id)
                         print(f"saved ({experiment_id[:8]}…)")
@@ -111,8 +123,9 @@ def parse_args():
     parser.add_argument("--mazes",    nargs="+", type=int, default=None)
     parser.add_argument("--n-runs",   type=int, default=20)
     parser.add_argument("--lookahead", type=int, default=3)
-    parser.add_argument("--no-db",   action="store_true", help="Skip Supabase, save locally only")
-    parser.add_argument("--live",    action="store_true", help="Show live maze visualization")
+    parser.add_argument("--no-db",    action="store_true", help="Skip Supabase, save locally only")
+    parser.add_argument("--live",     action="store_true", help="Show live maze visualization")
+    parser.add_argument("--no-video", action="store_true", help="Skip GIF video generation")
     return parser.parse_args()
 
 
@@ -144,6 +157,7 @@ if __name__ == "__main__":
             lookahead=args.lookahead,
             save_to_db=not args.no_db,
             live=args.live,
+            save_video=not args.no_video,
         ))
     finally:
         loop.close()

@@ -3,10 +3,13 @@ def navigator_system_prompt(
     lookahead: int,
     has_shared_memory: bool = False,
     has_observer: bool = False,
+    insight_interval: int = 7,
 ) -> str:
     tools = (
         "You have the following tools:\n"
-        "- get_location(): returns your current (x, y) position.\n"
+        "- get_location(): returns your current (x, y) position and recent_path — "
+        "the last 5 cells you visited with their distance to exit. "
+        "Use recent_path to avoid going back to cells you already visited.\n"
         "- get_surroundings(): returns how many open cells are visible in each direction "
         f"(north, south, east, west), up to {lookahead} cells ahead. "
         "0 means a wall is immediately in that direction.\n"
@@ -22,9 +25,10 @@ def navigator_system_prompt(
         )
     if has_observer:
         tools += (
-            "\n- get_insight(): asks the Observer agent to analyse all agents' trajectories "
-            "and return a movement recommendation tailored to your current position. "
-            "Use it when you are unsure which direction to take."
+            f"\n- get_insight(): asks the Observer agent to analyse all agents' trajectories "
+            f"and return a 4-section report with a movement recommendation. "
+            f"Available once every {insight_interval} moves — if called too soon you will receive "
+            f"a cooldown message telling you how many moves to wait."
         )
 
     strategy = (
@@ -36,10 +40,18 @@ def navigator_system_prompt(
         "3. Never repeatedly attempt a direction that returns success=False.\n"
         "4. Track the positions you have already visited from your move history and avoid returning to them."
     )
+    next_step = 5
     if has_shared_memory:
         strategy += (
-            "\n5. Call get_shared_memory() when choosing between multiple open directions — "
+            f"\n{next_step}. Call get_shared_memory() when choosing between multiple open directions — "
             "prefer directions that lead to cells NOT yet visited by any agent."
+        )
+        next_step += 1
+    if has_observer:
+        strategy += (
+            f"\n{next_step}. Call get_insight() every {insight_interval} moves — it is mandatory, not optional. "
+            f"As soon as it becomes available (every {insight_interval} successful moves) call it "
+            "and follow the recommendation in section 4 of its report."
         )
 
     return (
@@ -51,9 +63,20 @@ def navigator_system_prompt(
 
 def observer_system_prompt() -> str:
     return (
-        "You are an Observer agent monitoring a multi-agent maze navigation system. "
-        "You have access to the full trajectory history of all agents. "
-        "When asked, analyse the trajectories and provide a concise movement recommendation "
-        "to the requesting agent based on where other agents have already explored. "
-        "Be specific: recommend a direction and briefly explain why."
+        "You are an Observer agent monitoring a multi-agent maze navigation system.\n"
+        "You receive a visual map (█=wall, ·=explored, E=exit, 1/2/3=agent positions), "
+        "per-agent status data, and a request from one agent.\n\n"
+        "Respond with a structured report in exactly 4 sections:\n\n"
+        "1. MAP ANALYSIS\n"
+        "   Describe which zones are already explored and which corridors remain unexplored. "
+        "Be specific about coordinates or regions.\n\n"
+        "2. DISTANCE ANALYSIS\n"
+        "   Identify which agent is closest to the exit. "
+        "Explain what this implies for the other agents' coordination "
+        "(e.g. should they converge, spread out, or follow a specific route).\n\n"
+        "3. AGENT STATUS\n"
+        "   One line per agent: current position, distance to exit, steps taken so far.\n\n"
+        "4. RECOMMENDATION\n"
+        "   Give the requesting agent a specific direction (north/south/east/west) "
+        "and a one-sentence justification. Prioritise unexplored areas and efficient coordination."
     )

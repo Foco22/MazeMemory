@@ -81,6 +81,7 @@ Key flags:
 | `--n-runs` | Runs per scenario/maze combination (default: 20) |
 | `--live` | Show real-time maze visualization |
 | `--no-db` | Skip Supabase, save results locally to `results/` |
+| `--no-video` | Skip GIF video generation |
 
 ## Saving results to Supabase
 
@@ -90,6 +91,8 @@ Runs are always saved locally before any DB write:
 results/
   experiments/     ← one JSON per run (source of truth for sync)
   shared_memory/   ← one JSONL per run, written incrementally during execution
+  videos/
+    <timestamp>/   ← one GIF per run, grouped by batch (pass --no-video to skip)
 ```
 
 To upload to Supabase:
@@ -109,3 +112,10 @@ Runs already in the database are skipped automatically.
 ```bash
 pytest
 ```
+
+
+
+python -u experiments/run.py --scenarios shared_memory --mazes 1 --n-runs 10 --model deepseek/deepseek-chat --provider deepseek --live
+
+  python -u experiments/run.py --scenarios shared_memory --mazes 1 --n-runs 20 --model deepseek/deepseek-chat --provider
+  deepseek --live

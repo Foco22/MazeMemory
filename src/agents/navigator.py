@@ -54,6 +54,10 @@ class NavigatorAgent:
         self._context_messages = 0
         self._llm_turns = 0
 
+        # get_insight() cooldown: one call allowed every N moves, derived from maze size
+        self._insight_interval = max(maze.rows, maze.cols) // 2
+        self._last_insight_at = 0  # first call available only after _insight_interval moves
+
     async def run(self) -> dict:
         messages = [
             {
@@ -63,6 +67,7 @@ class NavigatorAgent:
                     self.lookahead,
                     has_shared_memory=self.shared_memory is not None,
                     has_observer=self.observer is not None,
+                    insight_interval=self._insight_interval,
                 ),
             },
             {"role": "user", "content": "Start navigating. Find the exit."},
@@ -168,7 +173,15 @@ class NavigatorAgent:
                 args["direction"] = m.group(1).lower()
 
         if name == "get_location":
-            result = {"x": self.position[0], "y": self.position[1]}
+            recent = self.path[-6:-1]  # last 5 cells before current position
+            result = {
+                "x": self.position[0],
+                "y": self.position[1],
+                "recent_path": [
+                    {"x": x, "y": y, "dist_to_exit": optimal_steps(self.maze, (x, y), self.maze.exit_pos)}
+                    for x, y in recent
+                ],
+            }
         elif name == "get_distance_to_exit":
             result = {"steps": optimal_steps(self.maze, self.position, self.maze.exit_pos)}
         elif name == "get_surroundings":
@@ -186,8 +199,14 @@ class NavigatorAgent:
                 if aid != self.agent_id and positions
             }
         elif name == "get_insight" and self.observer:
-            recommendation = await self.observer.get_insight(self.agent_id, self.position)
-            result = {"recommendation": recommendation}
+            steps_since = self.timestep - self._last_insight_at
+            if steps_since < self._insight_interval:
+                remaining = self._insight_interval - steps_since
+                result = {"cooldown": f"Not available yet. Move {remaining} more step(s) before calling get_insight again."}
+            else:
+                self._last_insight_at = self.timestep
+                recommendation = await self.observer.get_insight(self.agent_id, self.position)
+                result = {"recommendation": recommendation}
         else:
             result = {"error": f"unknown tool: {name}"}
 

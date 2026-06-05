@@ -12,6 +12,53 @@ from src.agents.context import compress_messages, print_messages
 
 MAX_STEPS = 500  # safety limit to prevent infinite loops
 
+
+def _log_context(agent_id: str, turn: int, messages: list, prompt_tokens: int) -> None:
+    def _section(label):
+        return f"  ··· {label} {'·'*(50 - len(label))}\n"
+
+    with open("trace.log", "a", encoding="utf-8") as f:
+        f.write(f"\n{'═'*60}\n")
+        f.write(f"[CONTEXT] A{agent_id}  turn={turn}  msgs={len(messages)}  tokens={prompt_tokens}\n")
+        f.write(f"{'═'*60}\n")
+
+        section = None
+        for i, msg in enumerate(messages):
+            role = msg.get("role") if isinstance(msg, dict) else getattr(msg, "role", "?")
+            content = msg.get("content") if isinstance(msg, dict) else getattr(msg, "content", None)
+            tool_calls = None if isinstance(msg, dict) else getattr(msg, "tool_calls", None)
+            tool_call_id = msg.get("tool_call_id") if isinstance(msg, dict) else None
+            text = str(content or "").replace("\n", " ")
+
+            # detect section transitions
+            new_section = None
+            if i == 0:
+                new_section = "SYSTEM PROMPT"
+            elif i == 1:
+                new_section = "COMPRESSED HISTORY"
+            elif isinstance(content, str) and content.startswith("[LAST OBSERVER INSIGHT]"):
+                new_section = "LAST OBSERVER INSIGHT"
+            elif isinstance(content, str) and content.startswith("[CURRENT SHARED MEMORY]"):
+                new_section = "CURRENT SHARED MEMORY"
+            elif role == "assistant" and tool_calls and section in ("COMPRESSED HISTORY", "SYSTEM PROMPT", "START"):
+                new_section = "RECENT FULL TURNS"
+            elif role == "assistant" and tool_calls and section == "CURRENT SHARED MEMORY":
+                new_section = "RECENT FULL TURNS"
+
+            if new_section and new_section != section:
+                section = new_section
+                f.write(_section(section))
+
+            if tool_calls:
+                calls = ", ".join(f"{tc.function.name}({tc.function.arguments})" for tc in tool_calls)
+                f.write(f"  [{i:02d}] assistant  → {calls}\n")
+            elif tool_call_id:
+                f.write(f"  [{i:02d}] tool result  {text}\n")
+            else:
+                f.write(f"  [{i:02d}] {role:10s}  {text}\n")
+
+        f.write(f"{'═'*60}\n")
+
 DIRECTIONS = {
     "north": (0, -1),
     "south": (0, 1),
@@ -31,6 +78,7 @@ class NavigatorAgent:
         shared_memory: SharedMemoryStore | None = None,
         observer=None,
         on_move=None,
+        on_llm_call=None,
         llm_kwargs: dict | None = None,
     ):
         self.agent_id = agent_id
@@ -41,6 +89,7 @@ class NavigatorAgent:
         self.shared_memory = shared_memory
         self.observer = observer
         self.on_move = on_move
+        self.on_llm_call = on_llm_call
 
         self.position = maze.start_positions[agent_index]
         self.path: list[tuple[int, int]] = [self.position]
@@ -52,7 +101,10 @@ class NavigatorAgent:
         self.trace: list[dict] = []
         self._action_step = 0
         self._context_messages = 0
+        self._last_prompt_tokens = 0
+        self._last_completion_tokens = 0
         self._llm_turns = 0
+        self._last_insight: str | None = None  # text of the most recent get_insight recommendation
 
         # get_insight() cooldown: one call allowed every N moves, derived from maze size
         self._insight_interval = max(maze.rows, maze.cols) // 2
@@ -80,34 +132,41 @@ class NavigatorAgent:
 
         agent_started_at = datetime.now()
         while self.position != self.maze.exit_pos and len(self.path) <= MAX_STEPS:
-            compressed = compress_messages(messages)
+            fresh_memory = None
+            if self.shared_memory:
+                all_data = await self.shared_memory.get_all()
+                snapshot = {
+                    f"agent_{aid}": {
+                        "x": positions[-1][0],
+                        "y": positions[-1][1],
+                        "steps_taken": len(positions),
+                    }
+                    for aid, positions in all_data.items()
+                    if aid != self.agent_id and positions
+                }
+                fresh_memory = snapshot or None
+
+            insight_age = (self.timestep - self._last_insight_at) if self._last_insight else None
+            compressed = compress_messages(messages, fresh_context=fresh_memory, last_insight=self._last_insight, last_insight_age=insight_age)
             response = await litellm.acompletion(
                 model=self.model,
                 messages=compressed,
                 tools=tools,
                 **self._llm_kwargs,
             )
-            self.prompt_tokens += response.usage.prompt_tokens
-            self.completion_tokens += response.usage.completion_tokens
+            self._last_prompt_tokens = response.usage.prompt_tokens
+            self._last_completion_tokens = response.usage.completion_tokens
+            self.prompt_tokens += self._last_prompt_tokens
+            self.completion_tokens += self._last_completion_tokens
             self.cache_hit_tokens += getattr(response.usage, "prompt_cache_hit_tokens", None) or 0
             self.cache_miss_tokens += getattr(response.usage, "prompt_cache_miss_tokens", None) or 0
-            self._context_messages = len(messages)
+            self._context_messages = len(compressed)
             self._llm_turns += 1
+            if self.on_llm_call:
+                await self.on_llm_call(self.agent_id, self._last_prompt_tokens, self._last_completion_tokens, self._context_messages)
 
-            # debug: uncomment to see token counts and compressed messages
-            # actual = response.usage.prompt_tokens
-            # print(f"[A{self.agent_id}] turn={self._llm_turns}  msgs_full={len(messages)}  msgs_compressed={len(compressed)}  tokens={actual}")
-            # print_messages(compressed, label=f"A{self.agent_id} turn {self._llm_turns}")
-
-            # debug: uncomment to dump full message history at turn 10
-            # if self._llm_turns == 10:
-            #     with open("trace.log", "a") as f:
-            #         f.write(f"\n{'='*60}\n")
-            #         f.write(f"[A{self.agent_id}] FULL MESSAGES AT TURN 10 ({len(messages)} msgs)\n")
-            #         f.write(f"{'='*60}\n")
-            #         for i, msg in enumerate(messages):
-            #             f.write(f"  [{i}] {msg}\n")
-            #         f.write(f"{'='*60}\n")
+            if os.environ.get("TRACE_CONTEXT"):
+                _log_context(self.agent_id, self._llm_turns, compressed, self._last_prompt_tokens)
 
             message = response.choices[0].message
             messages.append(message)
@@ -183,7 +242,7 @@ class NavigatorAgent:
                 ],
             }
         elif name == "get_distance_to_exit":
-            result = {"steps": optimal_steps(self.maze, self.position, self.maze.exit_pos)}
+            result = {"steps_to_exit": optimal_steps(self.maze, self.position, self.maze.exit_pos)}
         elif name == "get_surroundings":
             result = self._surroundings()
         elif name == "move":
@@ -207,6 +266,7 @@ class NavigatorAgent:
                 self._last_insight_at = self.timestep
                 recommendation = await self.observer.get_insight(self.agent_id, self.position)
                 result = {"recommendation": recommendation}
+                self._last_insight = recommendation
         else:
             result = {"error": f"unknown tool: {name}"}
 
@@ -242,7 +302,18 @@ class NavigatorAgent:
             if self.shared_memory:
                 await self.shared_memory.record(self.agent_id, nx, ny, self.timestep)
             if self.on_move:
-                await self.on_move(self.agent_id, self.position, self.timestep, self.prompt_tokens, self.completion_tokens, self._context_messages)
-            return {"success": True, "position": {"x": nx, "y": ny}}
+                await self.on_move(self.agent_id, self.position, self.timestep,
+                                   self.prompt_tokens, self.completion_tokens,
+                                   self._context_messages,
+                                   self._last_prompt_tokens, self._last_completion_tokens)
+            recent = self.path[-6:-1]  # last 5 cells before current position
+            return {
+                "success": True,
+                "position": {"x": nx, "y": ny},
+                "recent_path": [
+                    {"x": rx, "y": ry, "dist_to_exit": optimal_steps(self.maze, (rx, ry), self.maze.exit_pos)}
+                    for rx, ry in recent
+                ],
+            }
 
         return {"success": False, "position": {"x": x, "y": y}, "reason": "wall"}

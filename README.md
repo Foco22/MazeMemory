@@ -10,9 +10,17 @@ Three scenarios are compared:
 ## Setup
 
 ```bash
+python -m venv .venv
+source .venv/bin/activate
 pip install -e .
 cp .env.example .env  # add your API keys
 ```
+
+> **Note:** always activate the virtual environment before running any command:
+> ```bash
+> source .venv/bin/activate
+> ```
+> Without it, Python won't find the `src` package and will throw `ModuleNotFoundError: No module named 'src'`.
 
 ## Running experiments
 
@@ -112,10 +120,3 @@ Runs already in the database are skipped automatically.
 ```bash
 pytest
 ```
-
-
-
-python -u experiments/run.py --scenarios shared_memory --mazes 1 --n-runs 10 --model deepseek/deepseek-chat --provider deepseek --live
-
-  python -u experiments/run.py --scenarios shared_memory --mazes 1 --n-runs 20 --model deepseek/deepseek-chat --provider
-  deepseek --live

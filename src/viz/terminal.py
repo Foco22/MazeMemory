@@ -46,18 +46,32 @@ class LiveMazeView:
         self.prompt_tokens: dict[str, int] = {}
         self.completion_tokens: dict[str, int] = {}
         self.context_messages: dict[str, int] = {}
+        self.last_prompt: dict[str, int] = {}
+        self.last_completion: dict[str, int] = {}
         self._lock = asyncio.Lock()
         _enter_alt_screen()
         atexit.register(_exit_alt_screen)
 
     async def update(self, agent_id: str, position: tuple[int, int], timestep: int,
-                     prompt_tokens: int = 0, completion_tokens: int = 0, context_messages: int = 0) -> None:
+                     prompt_tokens: int = 0, completion_tokens: int = 0, context_messages: int = 0,
+                     last_prompt: int = 0, last_completion: int = 0) -> None:
         async with self._lock:
             self.positions[agent_id] = position
             self.steps[agent_id] = timestep
             self.prompt_tokens[agent_id] = prompt_tokens
             self.completion_tokens[agent_id] = completion_tokens
             self.context_messages[agent_id] = context_messages
+            self.last_prompt[agent_id] = last_prompt
+            self.last_completion[agent_id] = last_completion
+            self._render()
+
+    async def on_llm_call(self, agent_id: str, last_prompt: int, last_completion: int, context_messages: int) -> None:
+        async with self._lock:
+            self.last_prompt[agent_id] = last_prompt
+            self.last_completion[agent_id] = last_completion
+            self.context_messages[agent_id] = context_messages
+            self.prompt_tokens[agent_id] = self.prompt_tokens.get(agent_id, 0) + last_prompt
+            self.completion_tokens[agent_id] = self.completion_tokens.get(agent_id, 0) + last_completion
             self._render()
 
     def _render(self) -> None:
@@ -97,7 +111,7 @@ class LiveMazeView:
             cost = _cost(self.model, pt, ct)
             total_prompt += pt
             total_completion += ct
-            print(f"  {color}Agent {aid}{RESET}  pos={pos}  steps={steps}  ctx={msgs}msgs  prompt={pt}  completion={ct}  cost=${cost:.5f}{CLR}")
+            print(f"  {color}Agent {aid}{RESET}  pos={pos}  steps={steps}  prompt={pt}  completion={ct}  cost=${cost:.5f}{CLR}")
 
         print(CLR)
         total_cost = _cost(self.model, total_prompt, total_completion)

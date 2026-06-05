@@ -59,9 +59,11 @@ async def run_experiments(
 
                 try:
                     on_move = None
+                    on_llm_call = None
                     if live:
                         view = LiveMazeView(maze, model=model_config.model)
                         on_move = view.update
+                        on_llm_call = view.on_llm_call
                         print()  # space before first render
 
                     ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S")
@@ -81,6 +83,7 @@ async def run_experiments(
                         run_number=run_number,
                         lookahead=lookahead,
                         on_move=on_move,
+                        on_llm_call=on_llm_call,
                         shared_memory_log=sm_log,
                     )
                     result["maze_id"] = maze_id

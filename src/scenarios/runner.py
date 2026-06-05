@@ -18,6 +18,7 @@ async def run_scenario(
     run_number: int,
     lookahead: int = 3,
     on_move=None,
+    on_llm_call=None,
     shared_memory_log: Path | None = None,
 ) -> dict:
     assert scenario in SCENARIOS, f"Unknown scenario: {scenario}"
@@ -46,6 +47,7 @@ async def run_scenario(
             shared_memory=shared_memory,
             observer=observer,
             on_move=on_move,
+            on_llm_call=on_llm_call,
             llm_kwargs=llm_kwargs,
         )
         for i in range(3)

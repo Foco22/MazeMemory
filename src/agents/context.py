@@ -1,6 +1,10 @@
 import json
+import os
 
-COMPRESS_KEEP_TURNS = 2
+WINDOW_TURNS   = int(os.getenv("CONTEXT_WINDOW_TURNS", 10))
+FULL_TURNS     = int(os.getenv("CONTEXT_FULL_TURNS", 2))
+COMPRESS_TURNS = WINDOW_TURNS - FULL_TURNS
+
 
 def print_messages(messages: list, label: str = "") -> None:
     print(f"\n{'─'*50} {label}")
@@ -43,20 +47,71 @@ def _summarize_turn(assistant_msg, tool_results: list[dict]) -> str:
         elif name == "get_surroundings":
             parts.append(f"surr={{N:{res.get('north')},S:{res.get('south')},E:{res.get('east')},W:{res.get('west')}}}")
         elif name == "get_distance_to_exit":
-            parts.append(f"dist={res.get('steps')}")
+            parts.append(f"dist_to_exit={res.get('steps_to_exit')}")
         elif name == "move":
             d  = args.get("direction", "?")
             ok = res.get("success")
             p  = res.get("position", {})
             parts.append(f"move({d})->{'ok' if ok else 'wall'} pos=({p.get('x')},{p.get('y')})")
+        elif name in ("get_shared_memory", "get_insight"):
+            pass  # omitted from compressed history — fresh state is injected separately
         else:
             parts.append(f"{name}->{res}")
     return "[step] " + " | ".join(parts)
 
 
-def compress_messages(messages: list, keep_turns: int = COMPRESS_KEEP_TURNS) -> list:
-    """Replace old turns with compact text, keeping recent turns in full format."""
-    header = messages[:2]  # system + user
+def _filter_recent_flat(flat: list) -> list:
+    """
+    Replace stale get_shared_memory results with a placeholder (fresh state injected separately).
+    Keep only the latest get_insight result; replace older ones with a placeholder.
+    """
+    shared_mem_ids: set[str] = set()
+    insight_ids: list[str] = []
+
+    for msg in flat:
+        tool_calls = getattr(msg, "tool_calls", None) if not isinstance(msg, dict) else None
+        if not tool_calls:
+            continue
+        for tc in tool_calls:
+            name = getattr(tc.function, "name", "") if hasattr(tc, "function") else ""
+            if name == "get_shared_memory":
+                shared_mem_ids.add(tc.id)
+            elif name == "get_insight":
+                insight_ids.append(tc.id)
+
+    stale_insight_ids = set(insight_ids[:-1]) if len(insight_ids) > 1 else set()
+
+    if not shared_mem_ids and not stale_insight_ids:
+        return flat
+
+    result = []
+    for msg in flat:
+        if isinstance(msg, dict) and msg.get("role") == "tool":
+            tid = msg.get("tool_call_id")
+            if tid in shared_mem_ids:
+                result.append({**msg, "content": "[stale — see [CURRENT SHARED MEMORY] below]"})
+                continue
+            if tid in stale_insight_ids:
+                result.append({**msg, "content": "[stale — see latest get_insight result below]"})
+                continue
+        result.append(msg)
+
+    return result
+
+
+def compress_messages(
+    messages: list,
+    fresh_context: dict | None = None,
+    last_insight: str | None = None,
+    last_insight_age: int | None = None,
+) -> list:
+    """Sliding window of WINDOW_TURNS turns: last FULL_TURNS full, previous COMPRESS_TURNS compressed, rest discarded.
+
+    fresh_context: if provided, injected as [CURRENT SHARED MEMORY] after recent turns.
+    last_insight: if provided, injected as [LAST OBSERVER INSIGHT] after shared memory.
+    last_insight_age: moves elapsed since the insight was generated — shown in the label.
+    """
+    header = messages[:2]  # system + "Start navigating"
     rest   = messages[2:]
 
     turns: list[list] = []
@@ -71,11 +126,13 @@ def compress_messages(messages: list, keep_turns: int = COMPRESS_KEEP_TURNS) -> 
     if current:
         turns.append(current)
 
-    if len(turns) <= keep_turns:
-        return messages
-
-    old_turns    = turns[:-keep_turns]
-    recent_turns = turns[-keep_turns:]
+    if len(turns) <= WINDOW_TURNS:
+        # not enough turns to trigger sliding — keep all, compress old ones
+        old_turns    = turns[:-FULL_TURNS] if len(turns) > FULL_TURNS else []
+        recent_turns = turns[-FULL_TURNS:]
+    else:
+        old_turns    = turns[-WINDOW_TURNS:-FULL_TURNS]   # the 8 to compress
+        recent_turns = turns[-FULL_TURNS:]                # the 2 full
 
     compressed = []
     for turn in old_turns:
@@ -85,5 +142,15 @@ def compress_messages(messages: list, keep_turns: int = COMPRESS_KEEP_TURNS) -> 
         if summary:
             compressed.append({"role": "user", "content": summary})
 
-    recent_flat = [msg for turn in recent_turns for msg in turn]
-    return header + compressed + recent_flat
+    recent_flat = _filter_recent_flat([msg for turn in recent_turns for msg in turn])
+
+    insight_msgs = []
+    if last_insight:
+        age_str = f" — {last_insight_age} move{'s' if last_insight_age != 1 else ''} ago" if last_insight_age is not None else ""
+        insight_msgs = [{"role": "user", "content": f"[LAST OBSERVER INSIGHT{age_str}]\n{last_insight}"}]
+
+    fresh_msgs = []
+    if fresh_context:
+        fresh_msgs = [{"role": "user", "content": "[CURRENT SHARED MEMORY] " + json.dumps(fresh_context)}]
+
+    return header + compressed + recent_flat + fresh_msgs + insight_msgs

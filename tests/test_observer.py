@@ -116,3 +116,23 @@ class TestComputeAgentStatuses:
         statuses = observer._compute_agent_statuses(trajectories)
         assert len(statuses) == 1
         assert statuses[0]["agent_id"] == "2"
+
+
+class TestNearestWaypointOnPath:
+    def test_returns_closest_by_manhattan(self, observer):
+        trajectory = [(1, 1, 0), (5, 5, 1), (10, 10, 2)]
+        wp = observer._nearest_waypoint_on_path((4, 4), trajectory)
+        assert wp == (5, 5)
+
+    def test_returns_none_for_empty_trajectory(self, observer):
+        assert observer._nearest_waypoint_on_path((3, 3), []) is None
+
+    def test_returns_exact_match(self, observer):
+        trajectory = [(2, 3, 0), (7, 8, 1)]
+        wp = observer._nearest_waypoint_on_path((7, 8), trajectory)
+        assert wp == (7, 8)
+
+    def test_single_cell_trajectory(self, observer):
+        trajectory = [(5, 5, 0)]
+        wp = observer._nearest_waypoint_on_path((1, 1), trajectory)
+        assert wp == (5, 5)

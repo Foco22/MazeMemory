@@ -52,7 +52,12 @@ def _summarize_turn(assistant_msg, tool_results: list[dict]) -> str:
             d  = args.get("direction", "?")
             ok = res.get("success")
             p  = res.get("position", {})
-            parts.append(f"move({d})->{'ok' if ok else 'wall'} pos=({p.get('x')},{p.get('y')})")
+            recent = res.get("recent_path", [])
+            recent_str = "→".join(f"({r['x']},{r['y']})" for r in recent)
+            summary = f"move({d})->{'ok' if ok else 'wall'} pos=({p.get('x')},{p.get('y')})"
+            if recent_str:
+                summary += f" recent:[{recent_str}]"
+            parts.append(summary)
         elif name in ("get_shared_memory", "get_insight"):
             pass  # omitted from compressed history — fresh state is injected separately
         else:

@@ -51,11 +51,22 @@ class ObserverAgent:
         )
 
         if exit_found:
-            direction = self._relative_direction(position, self.maze.exit_pos)
-            coordination_context = (
-                f"PHASE 2 — EXIT FOUND: Agent {closest['agent_id']} reached the exit at {self.maze.exit_pos}.\n"
-                f"The exit is {direction} of your current position. Head there now."
-            )
+            successful_traj = trajectories.get(closest["agent_id"], [])
+            waypoint = self._nearest_waypoint_on_path(position, successful_traj)
+            exit_dir = self._relative_direction(position, self.maze.exit_pos)
+            if waypoint and waypoint != self.maze.exit_pos:
+                wp_dir = self._relative_direction(position, waypoint)
+                coordination_context = (
+                    f"PHASE 2 — EXIT FOUND: Agent {closest['agent_id']} has a confirmed navigable path to the exit.\n"
+                    f"Step 1: Reach waypoint {waypoint} on that confirmed path — it is {wp_dir} of your current position.\n"
+                    f"Step 2: From {waypoint}, follow the explored corridor (·) to the exit at {self.maze.exit_pos}.\n"
+                    f"IMPORTANT: Do NOT navigate directly to the exit using cardinal direction — "
+                    f"walls may block. Use the confirmed waypoint route."
+                )
+            else:
+                coordination_context = (
+                    f"PHASE 2 — EXIT FOUND at {self.maze.exit_pos} ({exit_dir}). Head there now."
+                )
         elif closest_teammate is not None and (my_distance is None or closest_teammate["distance_to_exit"] < my_distance):
             waypoint = closest_teammate["position"]
             direction = self._relative_direction(position, waypoint)
@@ -72,18 +83,23 @@ class ObserverAgent:
                 f"You are the scout — keep exploring. Other agents are following your progress."
             )
 
+        adj = self._adjacent_open_cells(position)
+
         user_message = (
             f"Agent {requesting_agent_id} is at {position} and requests navigation insight.\n\n"
             f"=== VISUAL MAP ===\n"
             f"Legend: █=wall  ·=explored  E=exit (Phase 2 only)  1/2/3=agent current position\n"
+            f"NOTE: █ means wall OR unexplored — use ADJACENT OPEN CELLS below for reliable direction info.\n"
             f"{visual_map}\n\n"
+            f"=== ADJACENT OPEN CELLS ===\n"
+            f"{adj}\n\n"
             f"=== AGENT STATUS ===\n"
             + "\n".join(status_lines) + "\n\n"
             + f"=== DISTANCE ANALYSIS ===\n"
             + f"{distance_note}\n\n"
             + f"=== COORDINATION CONTEXT ===\n"
             + coordination_context + "\n\n"
-            + f"Produce the 4-section report for Agent {requesting_agent_id}."
+            + f"Produce the 5-section report for Agent {requesting_agent_id}."
         )
 
         ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
@@ -105,7 +121,13 @@ class ObserverAgent:
         self.prompt_tokens += response.usage.prompt_tokens
         self.completion_tokens += response.usage.completion_tokens
 
-        return response.choices[0].message.content
+        recommendation = response.choices[0].message.content
+        with open("trace.log", "a", encoding="utf-8") as f:
+            f.write("--- OBSERVER RESPONSE ---\n")
+            f.write(recommendation + "\n")
+            f.write(f"\n[MAZE MAP]\n{visual_map}\n")
+            f.write("--- END OBSERVER RESPONSE ---\n")
+        return recommendation + f"\n\n[MAZE MAP]\n{visual_map}"
 
     def _relative_direction(self, from_pos: tuple[int, int], to_pos: tuple[int, int]) -> str:
         """Cardinal/intercardinal direction from from_pos to to_pos, no pathfinding."""
@@ -152,6 +174,30 @@ class ObserverAgent:
                     row += "█"
             lines.append(row)
         return "\n".join(lines)
+
+    def _adjacent_open_cells(self, position: tuple[int, int]) -> str:
+        """One line per direction: open/wall status from actual maze data (no inference needed)."""
+        x, y = position
+        directions = {"north": (0, -1), "south": (0, 1), "east": (1, 0), "west": (-1, 0)}
+        lines = []
+        for name, (dx, dy) in directions.items():
+            nx, ny = x + dx, y + dy
+            if self.maze.is_open(nx, ny):
+                dist = optimal_steps(self.maze, (nx, ny), self.maze.exit_pos)
+                dist_str = f"dist_to_exit={dist}" if dist is not None else "dist_to_exit=unknown"
+                lines.append(f"  {name}: ({nx},{ny}) OPEN — {dist_str}")
+            else:
+                lines.append(f"  {name}: WALL")
+        return "\n".join(lines)
+
+    def _nearest_waypoint_on_path(
+        self, position: tuple[int, int], trajectory: list[tuple[int, int, int]]
+    ) -> tuple[int, int] | None:
+        """Cell on trajectory nearest to position by Manhattan distance (no A* — fast)."""
+        cells = [(x, y) for x, y, _ in trajectory]
+        if not cells:
+            return None
+        return min(cells, key=lambda wp: abs(wp[0] - position[0]) + abs(wp[1] - position[1]))
 
     def _compute_agent_statuses(self, trajectories: dict) -> list[dict]:
         """Per-agent position, distance to exit, and step count from shared memory."""

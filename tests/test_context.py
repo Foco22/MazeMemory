@@ -1,6 +1,6 @@
 import json
 import pytest
-from src.agents.context import _filter_recent_flat, compress_messages
+from src.agents.context import _filter_recent_flat, _summarize_turn, compress_messages
 
 
 # ── helpers ──────────────────────────────────────────────────────────────────
@@ -121,6 +121,35 @@ def test_compress_injects_fresh_context_once():
 def test_compress_no_fresh_context_leaves_no_injection():
     result = compress_messages(_make_messages_with_shared_memory(), fresh_context=None)
     assert _injected_fresh(result) == []
+
+
+# ── _summarize_turn: recent_path in move ─────────────────────────────────────
+
+def test_summarize_move_includes_recent_path():
+    tc = _TC("m1", "move")
+    tc.function.arguments = json.dumps({"direction": "north"})
+    asst = _Msg([tc])
+    tool = _tool_result("m1", {
+        "success": True,
+        "position": {"x": 3, "y": 2},
+        "recent_path": [
+            {"x": 3, "y": 5, "dist_to_exit": 8},
+            {"x": 3, "y": 4, "dist_to_exit": 7},
+            {"x": 3, "y": 3, "dist_to_exit": 6},
+        ],
+    })
+    summary = _summarize_turn(asst, [tool])
+    assert "recent:[(3,5)→(3,4)→(3,3)]" in summary
+
+
+def test_summarize_move_without_recent_path():
+    tc = _TC("m2", "move")
+    tc.function.arguments = json.dumps({"direction": "east"})
+    asst = _Msg([tc])
+    tool = _tool_result("m2", {"success": False, "position": {"x": 1, "y": 1}})
+    summary = _summarize_turn(asst, [tool])
+    assert "move(east)->wall pos=(1,1)" in summary
+    assert "recent" not in summary
 
 
 def test_compress_stale_shared_memory_results_replaced():

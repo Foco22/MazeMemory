@@ -147,7 +147,17 @@ class NavigatorAgent:
                 fresh_memory = snapshot or None
 
             insight_age = (self.timestep - self._last_insight_at) if self._last_insight else None
-            compressed = compress_messages(messages, fresh_context=fresh_memory, last_insight=self._last_insight, last_insight_age=insight_age)
+            active_insight = (
+                self._last_insight
+                if insight_age is not None and insight_age < self._insight_interval
+                else None
+            )
+            compressed = compress_messages(
+                messages,
+                fresh_context=fresh_memory,
+                last_insight=active_insight,
+                last_insight_age=insight_age if active_insight else None,
+            )
             response = await litellm.acompletion(
                 model=self.model,
                 messages=compressed,

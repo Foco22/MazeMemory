@@ -7,6 +7,13 @@ Requires-Dist: supabase>=2.0.0
 Requires-Dist: python-dotenv>=1.0.0
 Requires-Dist: matplotlib>=3.10.9
 Requires-Dist: pillow>=12.2.0
+Requires-Dist: jupyter>=1.1.1
+Requires-Dist: nbconvert>=7.17.1
+Requires-Dist: pandas>=2.3.3
+Requires-Dist: seaborn>=0.13.2
+Requires-Dist: scipy>=1.15.3
+Requires-Dist: statsmodels>=0.14.6
+Requires-Dist: tabulate>=0.10.0
 Provides-Extra: dev
 Requires-Dist: pytest>=8.0.0; extra == "dev"
 Requires-Dist: pytest-asyncio>=0.23.0; extra == "dev"

@@ -27,6 +27,8 @@ src/scenarios/config.py
 src/scenarios/runner.py
 src/viz/__init__.py
 src/viz/terminal.py
+src/viz/video.py
+tests/test_context.py
 tests/test_db_client.py
 tests/test_maze.py
 tests/test_metrics.py
@@ -36,3 +38,4 @@ tests/test_runner.py
 tests/test_shared_memory.py
 tests/test_sync.py
 tests/test_terminal.py
+tests/test_video.py

@@ -5,4 +5,4 @@ __pycache__/
 .venv/
 results/
 *.json.bak
-trace.log
+trace*.log

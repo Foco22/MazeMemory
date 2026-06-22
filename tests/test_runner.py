@@ -100,6 +100,32 @@ async def test_total_tokens_aggregated(maze):
     assert result["total_tokens"] == 450
 
 
+@pytest.mark.asyncio
+async def test_observer_scenario_no_raw_memory_tool(maze):
+    """Observer-only: navigators have shared_memory (to write) and observer,
+    but raw_memory_tool=False so they cannot call get_shared_memory directly."""
+    mock_results = [make_agent_result(str(i)) for i in range(3)]
+
+    with patch("src.scenarios.runner.NavigatorAgent") as MockNav, \
+         patch("src.scenarios.runner.ObserverAgent") as MockObs:
+
+        mock_obs_instance = MagicMock()
+        mock_obs_instance.prompt_tokens = 10
+        mock_obs_instance.completion_tokens = 5
+        MockObs.return_value = mock_obs_instance
+
+        nav_instance = AsyncMock()
+        nav_instance.run = AsyncMock(side_effect=mock_results)
+        MockNav.return_value = nav_instance
+
+        await run_scenario("observer", maze, MODEL, run_number=1)
+
+    call_kwargs = MockNav.call_args_list[0].kwargs
+    assert call_kwargs["shared_memory"] is not None,  "shared_memory must exist so navigators can write"
+    assert call_kwargs["observer"] is mock_obs_instance, "observer must be set"
+    assert call_kwargs["raw_memory_tool"] is False,   "navigators must not have direct raw memory access"
+
+
 def test_invalid_scenario_raises(maze):
     import asyncio
     with pytest.raises(AssertionError):

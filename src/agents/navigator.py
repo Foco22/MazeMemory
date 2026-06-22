@@ -9,6 +9,7 @@ from src.memory.shared import SharedMemoryStore
 from src.agents.tools import build_tools, build_shared_memory_tool, build_insight_tool
 from src.agents.prompts import navigator_system_prompt
 from src.agents.context import compress_messages, print_messages
+from src.agents.rate_limiter import AsyncRateLimiter
 
 MAX_STEPS = 500  # safety limit to prevent infinite loops
 
@@ -50,7 +51,7 @@ def _log_context(agent_id: str, turn: int, messages: list, prompt_tokens: int) -
                 f.write(_section(section))
 
             if tool_calls:
-                calls = ", ".join(f"{tc.function.name}({tc.function.arguments})" for tc in tool_calls)
+                calls = ", ".join(f"{(tc['function']['name'] if isinstance(tc, dict) else tc.function.name)}({(tc['function']['arguments'] if isinstance(tc, dict) else tc.function.arguments)})" for tc in tool_calls)
                 f.write(f"  [{i:02d}] assistant  → {calls}\n")
             elif tool_call_id:
                 f.write(f"  [{i:02d}] tool result  {text}\n")
@@ -77,17 +78,21 @@ class NavigatorAgent:
         lookahead: int = 3,
         shared_memory: SharedMemoryStore | None = None,
         observer=None,
+        raw_memory_tool: bool = True,
         on_move=None,
         on_llm_call=None,
         llm_kwargs: dict | None = None,
+        rate_limiter: AsyncRateLimiter | None = None,
     ):
         self.agent_id = agent_id
         self.maze = maze
         self.model = model
         self.lookahead = lookahead
         self._llm_kwargs: dict = llm_kwargs or {}
+        self._rate_limiter = rate_limiter
         self.shared_memory = shared_memory
         self.observer = observer
+        self.raw_memory_tool = raw_memory_tool
         self.on_move = on_move
         self.on_llm_call = on_llm_call
 
@@ -104,7 +109,6 @@ class NavigatorAgent:
         self._last_prompt_tokens = 0
         self._last_completion_tokens = 0
         self._llm_turns = 0
-        self._last_insight: str | None = None  # text of the most recent get_insight recommendation
 
         # get_insight() cooldown: one call allowed every N moves, derived from maze size
         self._insight_interval = max(maze.rows, maze.cols) // 2
@@ -125,51 +129,31 @@ class NavigatorAgent:
             {"role": "user", "content": "Start navigating. Find the exit."},
         ]
         tools = build_tools(self.lookahead)
-        if self.shared_memory:
+        if self.shared_memory and self.raw_memory_tool:
             tools.append(build_shared_memory_tool())
         if self.observer:
             tools.append(build_insight_tool())
 
         agent_started_at = datetime.now()
         while self.position != self.maze.exit_pos and len(self.path) <= MAX_STEPS:
-            fresh_memory = None
-            if self.shared_memory:
-                all_data = await self.shared_memory.get_all()
-                snapshot = {
-                    f"agent_{aid}": {
-                        "x": positions[-1][0],
-                        "y": positions[-1][1],
-                        "steps_taken": len(positions),
-                    }
-                    for aid, positions in all_data.items()
-                    if aid != self.agent_id and positions
-                }
-                fresh_memory = snapshot or None
-
-            insight_age = (self.timestep - self._last_insight_at) if self._last_insight else None
-            active_insight = (
-                self._last_insight
-                if insight_age is not None and insight_age < self._insight_interval
-                else None
-            )
-            compressed = compress_messages(
-                messages,
-                fresh_context=fresh_memory,
-                last_insight=active_insight,
-                last_insight_age=insight_age if active_insight else None,
-            )
+            compressed = compress_messages(messages)
+            if self._rate_limiter:
+                await self._rate_limiter.acquire()
             response = await litellm.acompletion(
                 model=self.model,
                 messages=compressed,
                 tools=tools,
+                num_retries=6,
+                timeout=120,
                 **self._llm_kwargs,
             )
             self._last_prompt_tokens = response.usage.prompt_tokens
             self._last_completion_tokens = response.usage.completion_tokens
             self.prompt_tokens += self._last_prompt_tokens
             self.completion_tokens += self._last_completion_tokens
-            self.cache_hit_tokens += getattr(response.usage, "prompt_cache_hit_tokens", None) or 0
-            self.cache_miss_tokens += getattr(response.usage, "prompt_cache_miss_tokens", None) or 0
+            _details = getattr(response.usage, "prompt_tokens_details", None)
+            self.cache_hit_tokens += (getattr(_details, "cached_tokens", None) or 0) if _details else 0
+            self.cache_miss_tokens += (getattr(_details, "cache_creation_tokens", None) or 0) if _details else 0
             self._context_messages = len(compressed)
             self._llm_turns += 1
             if self.on_llm_call:
@@ -276,7 +260,6 @@ class NavigatorAgent:
                 self._last_insight_at = self.timestep
                 recommendation = await self.observer.get_insight(self.agent_id, self.position)
                 result = {"recommendation": recommendation}
-                self._last_insight = recommendation
         else:
             result = {"error": f"unknown tool: {name}"}
 

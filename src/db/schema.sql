@@ -17,15 +17,20 @@ CREATE TABLE experiments (
     total_tokens            INTEGER     NOT NULL,
     total_cache_hit_tokens  INTEGER,
     total_cache_miss_tokens INTEGER,
-    observer_prompt_tokens     INTEGER,
-    observer_completion_tokens INTEGER,
+    observer_prompt_tokens      INTEGER,
+    observer_completion_tokens  INTEGER,
+    observer_cache_hit_tokens   INTEGER,
+    observer_cache_miss_tokens  INTEGER,
     cost_prompt_usd            NUMERIC(12, 6),
     cost_completion_usd        NUMERIC(12, 6),
     cost_agents_usd            NUMERIC(12, 6),
     cost_observer_usd          NUMERIC(12, 6),
     cost_total_usd             NUMERIC(12, 6),
-    duration_seconds           NUMERIC(10, 3)
+    duration_seconds           NUMERIC(10, 3),
+    batch_id                   TEXT
 );
+
+CREATE INDEX idx_experiments_batch_id ON experiments (batch_id);
 
 CREATE TABLE agent_runs (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -37,10 +42,13 @@ CREATE TABLE agent_runs (
     prompt_tokens     INTEGER NOT NULL,
     completion_tokens INTEGER NOT NULL,
     total_tokens      INTEGER NOT NULL,
-    cache_hit_tokens  INTEGER,
-    cache_miss_tokens INTEGER,
-    reached_exit      BOOLEAN NOT NULL,
-    duration_seconds  NUMERIC(10, 3)
+    cache_hit_tokens     INTEGER,
+    cache_miss_tokens    INTEGER,
+    reached_exit         BOOLEAN NOT NULL,
+    duration_seconds     NUMERIC(10, 3),
+    redundant_cells      INTEGER,
+    total_cells_visited  INTEGER,
+    redundancy_ratio     NUMERIC(8, 4)
 );
 
 CREATE TABLE trajectories (
@@ -50,6 +58,14 @@ CREATE TABLE trajectories (
     x               INTEGER NOT NULL,
     y               INTEGER NOT NULL,
     timestep        INTEGER NOT NULL
+);
+
+-- Model pricing (USD per 1M tokens) — mirrors prices.json
+CREATE TABLE model_prices (
+    model            TEXT           PRIMARY KEY,
+    input_usd_1m     NUMERIC(10, 4) NOT NULL,
+    output_usd_1m    NUMERIC(10, 4) NOT NULL,
+    cache_hit_usd_1m NUMERIC(10, 4)
 );
 
 -- One row per tool call — captures every decision the agent made

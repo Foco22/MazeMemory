@@ -13,6 +13,8 @@ class ObserverAgent:
         self.shared_memory = shared_memory
         self.prompt_tokens = 0
         self.completion_tokens = 0
+        self.cache_hit_tokens = 0
+        self.cache_miss_tokens = 0
         self._llm_kwargs: dict = llm_kwargs or {}
 
     async def get_insight(self, requesting_agent_id: str, position: tuple[int, int]) -> str:
@@ -120,6 +122,9 @@ class ObserverAgent:
 
         self.prompt_tokens += response.usage.prompt_tokens
         self.completion_tokens += response.usage.completion_tokens
+        _details = getattr(response.usage, "prompt_tokens_details", None)
+        self.cache_hit_tokens += (getattr(_details, "cached_tokens", None) or 0) if _details else 0
+        self.cache_miss_tokens += (getattr(_details, "cache_creation_tokens", None) or 0) if _details else 0
 
         recommendation = response.choices[0].message.content
         with open("trace.log", "a", encoding="utf-8") as f:

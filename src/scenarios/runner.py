@@ -5,10 +5,12 @@ from src.maze.generator import Maze
 from src.memory.shared import SharedMemoryStore
 from src.agents.navigator import NavigatorAgent
 from src.agents.observer import ObserverAgent
+from src.agents.rate_limiter import AsyncRateLimiter
 from src.scenarios.config import ModelConfig
 from src.maze.pathfinding import optimal_steps as _optimal_steps
+from src.metrics.calculator import RedundantComputationReduction
 
-SCENARIOS = ("baseline", "shared_memory", "shared_memory_observer")
+SCENARIOS = ("baseline", "shared_memory", "observer", "shared_memory_observer")
 
 
 async def run_scenario(
@@ -25,6 +27,8 @@ async def run_scenario(
 
     shared_memory = SharedMemoryStore(log_path=shared_memory_log) if scenario != "baseline" else None
 
+    rate_limiter = AsyncRateLimiter(model_config.rate_limit) if model_config.rate_limit else None
+
     llm_kwargs = {}
     if model_config.api_base:
         llm_kwargs["api_base"] = model_config.api_base
@@ -33,9 +37,13 @@ async def run_scenario(
 
     observer = (
         ObserverAgent(maze, model_config.model, shared_memory, llm_kwargs=llm_kwargs)
-        if scenario == "shared_memory_observer"
+        if scenario in ("observer", "shared_memory_observer")
         else None
     )
+
+    # "observer" scenario: navigators write to shared_memory (observer reads it)
+    # but cannot read it directly — only via get_insight.
+    raw_memory_tool = scenario not in ("baseline", "observer")
 
     agents = [
         NavigatorAgent(
@@ -46,9 +54,11 @@ async def run_scenario(
             lookahead=lookahead,
             shared_memory=shared_memory,
             observer=observer,
+            raw_memory_tool=raw_memory_tool,
             on_move=on_move,
             on_llm_call=on_llm_call,
             llm_kwargs=llm_kwargs,
+            rate_limiter=rate_limiter,
         )
         for i in range(3)
     ]
@@ -63,12 +73,22 @@ async def run_scenario(
         ar["optimal_steps"] = opt
         ar["optimality_ratio"] = round(ratio, 4) if ratio is not None else None
 
+    redundancy_results = RedundantComputationReduction(maze).compute({"agents": list(agent_results)})
+    redundancy_by_id = {r["agent_id"]: r for r in redundancy_results}
+    for ar in agent_results:
+        red = redundancy_by_id.get(ar["agent_id"], {})
+        ar["redundant_cells"]     = red.get("redundant_cells")
+        ar["total_cells_visited"] = red.get("total_cells_visited")
+        ar["redundancy_ratio"]    = red.get("ratio")
+
     observer_tokens = None
     if observer:
         observer_tokens = {
-            "prompt_tokens": observer.prompt_tokens,
+            "prompt_tokens":    observer.prompt_tokens,
             "completion_tokens": observer.completion_tokens,
-            "total_tokens": observer.prompt_tokens + observer.completion_tokens,
+            "total_tokens":     observer.prompt_tokens + observer.completion_tokens,
+            "cache_hit_tokens":  observer.cache_hit_tokens or None,
+            "cache_miss_tokens": observer.cache_miss_tokens or None,
         }
 
     total_prompt = sum(r["prompt_tokens"] for r in agent_results)

@@ -30,21 +30,14 @@ class SupabaseClient:
         )
         return len(resp.data) > 0
 
-    async def save_run(self, result: dict, maze_id: int) -> str:
+    async def save_run(self, result: dict, maze_id: int, batch_id: str | None = None) -> str:
         tokens = TokenConsumption().compute(result)
         price = tokens["_price"]
-        price_in   = price["input"]
-        price_out  = price["output"]
-        price_hit  = price.get("cache_hit", price_in)
+        price_in  = price["input"]
+        price_out = price["output"]
 
-        def _cost_with_cache(prompt, completion, cache_hit, cache_miss):
-            uncategorized = max(0, prompt - (cache_hit or 0) - (cache_miss or 0))
-            return round(
-                ((cache_hit or 0) * price_hit + (cache_miss or 0 + uncategorized) * price_in + completion * price_out) / 1_000_000, 6
-            )
-
-        cost_prompt     = round(tokens["estimated_cost_usd"] - result["total_completion_tokens"] * price_out / 1_000_000, 6)
         cost_completion = round(result["total_completion_tokens"] * price_out / 1_000_000, 6)
+        cost_prompt     = round(tokens["estimated_cost_usd"] - cost_completion, 6)
         cost_agents     = round(tokens["estimated_cost_usd"], 6)
 
         obs = result["observer_tokens"]
@@ -59,6 +52,7 @@ class SupabaseClient:
         exp_duration = round((completed - started).total_seconds(), 3)
 
         exp_row = {
+            "batch_id":                   batch_id,
             "scenario":                   result["scenario"],
             "maze_id":                    maze_id,
             "maze_seed":                  result["maze_seed"],
@@ -74,8 +68,10 @@ class SupabaseClient:
             "total_tokens":               result["total_tokens"],
             "total_cache_hit_tokens":     result.get("total_cache_hit_tokens"),
             "total_cache_miss_tokens":    result.get("total_cache_miss_tokens"),
-            "observer_prompt_tokens":     obs["prompt_tokens"]     if obs else None,
-            "observer_completion_tokens": obs["completion_tokens"] if obs else None,
+            "observer_prompt_tokens":      obs["prompt_tokens"]      if obs else None,
+            "observer_completion_tokens":  obs["completion_tokens"]  if obs else None,
+            "observer_cache_hit_tokens":   obs.get("cache_hit_tokens")  if obs else None,
+            "observer_cache_miss_tokens":  obs.get("cache_miss_tokens") if obs else None,
             "cost_prompt_usd":            cost_prompt,
             "cost_completion_usd":        cost_completion,
             "cost_agents_usd":            cost_agents,
@@ -97,10 +93,13 @@ class SupabaseClient:
                 "prompt_tokens":    a["prompt_tokens"],
                 "completion_tokens": a["completion_tokens"],
                 "total_tokens":     a["total_tokens"],
-                "cache_hit_tokens": a.get("cache_hit_tokens"),
-                "cache_miss_tokens": a.get("cache_miss_tokens"),
-                "reached_exit":     a["reached_exit"],
-                "duration_seconds": a.get("duration_seconds"),
+                "cache_hit_tokens":   a.get("cache_hit_tokens"),
+                "cache_miss_tokens":  a.get("cache_miss_tokens"),
+                "reached_exit":       a["reached_exit"],
+                "duration_seconds":   a.get("duration_seconds"),
+                "redundant_cells":    a.get("redundant_cells"),
+                "total_cells_visited": a.get("total_cells_visited"),
+                "redundancy_ratio":   a.get("redundancy_ratio"),
             }
             for a in result["agents"]
         ]

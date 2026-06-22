@@ -1,9 +1,20 @@
 import json
 import os
+import re
 
 WINDOW_TURNS   = int(os.getenv("CONTEXT_WINDOW_TURNS", 10))
 FULL_TURNS     = int(os.getenv("CONTEXT_FULL_TURNS", 2))
 COMPRESS_TURNS = WINDOW_TURNS - FULL_TURNS
+
+
+def _tc_name(tc) -> str:
+    return tc["function"]["name"] if isinstance(tc, dict) else tc.function.name
+
+def _tc_arguments(tc) -> str:
+    return tc["function"]["arguments"] if isinstance(tc, dict) else tc.function.arguments
+
+def _tc_id(tc) -> str:
+    return tc["id"] if isinstance(tc, dict) else tc.id
 
 
 def print_messages(messages: list, label: str = "") -> None:
@@ -15,7 +26,7 @@ def print_messages(messages: list, label: str = "") -> None:
         tool_call_id = msg.get("tool_call_id") if isinstance(msg, dict) else None
 
         if tool_calls:
-            calls = ", ".join(f"{tc.function.name}({tc.function.arguments})" for tc in tool_calls)
+            calls = ", ".join(f"{_tc_name(tc)}({_tc_arguments(tc)})" for tc in tool_calls)
             print(f"  [{i}] {role} → calls: {calls}")
         elif tool_call_id:
             print(f"  [{i}] tool result: {content}")
@@ -23,6 +34,23 @@ def print_messages(messages: list, label: str = "") -> None:
             text = str(content or "")[:200]
             print(f"  [{i}] {role}: {text}")
     print(f"{'─'*50}\n")
+
+
+def _extract_insight_summary(text: str) -> str:
+    """Extract sections 4 (Strategic Recommendation) and 5 (Immediate Next Move) from observer report."""
+    rec = move = ""
+    m4 = re.search(r'4\.\s+(?:STRATEGIC\s+)?RECOMMENDATION[^\n]*\n+\s*(.+?)(?:\n|$)', text, re.IGNORECASE)
+    m5 = re.search(r'5\.\s+IMMEDIATE\s+NEXT\s+MOVE[^\n]*\n+\s*(.+?)(?:\n|$)', text, re.IGNORECASE)
+    if m4:
+        rec = re.sub(r'\*+', '', m4.group(1)).strip()
+    if m5:
+        move = re.sub(r'\*+', '', m5.group(1)).strip()
+    parts = []
+    if rec:
+        parts.append(f"rec:{rec[:100]}")
+    if move:
+        parts.append(f"move:{move[:80]}")
+    return " | ".join(parts) if parts else "insight received"
 
 
 def _summarize_turn(assistant_msg, tool_results: list[dict]) -> str:
@@ -39,9 +67,9 @@ def _summarize_turn(assistant_msg, tool_results: list[dict]) -> str:
 
     parts = []
     for tc in tool_calls:
-        name = tc.function.name
-        args = json.loads(tc.function.arguments or "{}")
-        res  = by_id.get(tc.id, {})
+        name = _tc_name(tc)
+        args = json.loads(_tc_arguments(tc) or "{}")
+        res  = by_id.get(_tc_id(tc), {})
         if name == "get_location":
             parts.append(f"loc=({res.get('x')},{res.get('y')})")
         elif name == "get_surroundings":
@@ -58,64 +86,22 @@ def _summarize_turn(assistant_msg, tool_results: list[dict]) -> str:
             if recent_str:
                 summary += f" recent:[{recent_str}]"
             parts.append(summary)
-        elif name in ("get_shared_memory", "get_insight"):
-            pass  # omitted from compressed history — fresh state is injected separately
+        elif name == "get_insight":
+            rec_text = res.get("recommendation", "") if isinstance(res, dict) else str(res)
+            parts.append("get_insight→" + _extract_insight_summary(rec_text))
+        elif name == "get_shared_memory":
+            pass  # raw memory data omitted from compressed history
         else:
             parts.append(f"{name}->{res}")
     return "[step] " + " | ".join(parts)
 
 
 def _filter_recent_flat(flat: list) -> list:
-    """
-    Replace stale get_shared_memory results with a placeholder (fresh state injected separately).
-    Keep only the latest get_insight result; replace older ones with a placeholder.
-    """
-    shared_mem_ids: set[str] = set()
-    insight_ids: list[str] = []
-
-    for msg in flat:
-        tool_calls = getattr(msg, "tool_calls", None) if not isinstance(msg, dict) else None
-        if not tool_calls:
-            continue
-        for tc in tool_calls:
-            name = getattr(tc.function, "name", "") if hasattr(tc, "function") else ""
-            if name == "get_shared_memory":
-                shared_mem_ids.add(tc.id)
-            elif name == "get_insight":
-                insight_ids.append(tc.id)
-
-    stale_insight_ids = set(insight_ids[:-1]) if len(insight_ids) > 1 else set()
-
-    if not shared_mem_ids and not stale_insight_ids:
-        return flat
-
-    result = []
-    for msg in flat:
-        if isinstance(msg, dict) and msg.get("role") == "tool":
-            tid = msg.get("tool_call_id")
-            if tid in shared_mem_ids:
-                result.append({**msg, "content": "[stale — see [CURRENT SHARED MEMORY] below]"})
-                continue
-            if tid in stale_insight_ids:
-                result.append({**msg, "content": "[stale — see latest get_insight result below]"})
-                continue
-        result.append(msg)
-
-    return result
+    return flat
 
 
-def compress_messages(
-    messages: list,
-    fresh_context: dict | None = None,
-    last_insight: str | None = None,
-    last_insight_age: int | None = None,
-) -> list:
-    """Sliding window of WINDOW_TURNS turns: last FULL_TURNS full, previous COMPRESS_TURNS compressed, rest discarded.
-
-    fresh_context: if provided, injected as [CURRENT SHARED MEMORY] after recent turns.
-    last_insight: if provided, injected as [LAST OBSERVER INSIGHT] after shared memory.
-    last_insight_age: moves elapsed since the insight was generated — shown in the label.
-    """
+def compress_messages(messages: list) -> list:
+    """Sliding window of WINDOW_TURNS turns: last FULL_TURNS full, previous COMPRESS_TURNS compressed, rest discarded."""
     header = messages[:2]  # system + "Start navigating"
     rest   = messages[2:]
 
@@ -149,13 +135,4 @@ def compress_messages(
 
     recent_flat = _filter_recent_flat([msg for turn in recent_turns for msg in turn])
 
-    insight_msgs = []
-    if last_insight:
-        age_str = f" — {last_insight_age} move{'s' if last_insight_age != 1 else ''} ago" if last_insight_age is not None else ""
-        insight_msgs = [{"role": "user", "content": f"[LAST OBSERVER INSIGHT{age_str}]\n{last_insight}"}]
-
-    fresh_msgs = []
-    if fresh_context:
-        fresh_msgs = [{"role": "user", "content": "[CURRENT SHARED MEMORY] " + json.dumps(fresh_context)}]
-
-    return header + compressed + recent_flat + fresh_msgs + insight_msgs
+    return header + compressed + recent_flat

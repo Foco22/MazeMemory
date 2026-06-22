@@ -2,8 +2,19 @@ import asyncio
 import json
 import argparse
 import traceback
+import uuid
+import warnings
 from pathlib import Path
 from datetime import datetime, timezone
+
+warnings.filterwarnings("ignore", category=UserWarning, module="pydantic")
+
+import logging
+logging.getLogger("LiteLLM").setLevel(logging.ERROR)
+logging.getLogger("LiteLLM Router").setLevel(logging.ERROR)
+
+import litellm
+litellm.suppress_debug_info = True
 
 from src.maze.instances import get_maze, available_maze_ids
 from src.scenarios.runner import run_scenario, SCENARIOS
@@ -33,6 +44,7 @@ async def run_experiments(
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     SHARED_MEM_DIR.mkdir(parents=True, exist_ok=True)
 
+    batch_id = str(uuid.uuid4())
     batch_ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S")
     videos_folder = VIDEOS_DIR / batch_ts
     if save_video:
@@ -44,7 +56,7 @@ async def run_experiments(
     completed = 0
     failed = 0
 
-    print(f"Starting {total} runs — model: {model_config.model}")
+    print(f"Starting {total} runs — model: {model_config.model}  batch_id: {batch_id}")
     print(f"Scenarios: {scenarios}")
     print(f"Mazes: {maze_ids}  |  Runs per combo: {n_runs}\n")
 
@@ -67,7 +79,7 @@ async def run_experiments(
                         print()  # space before first render
 
                     ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S")
-                    with open("trace.log", "a", encoding="utf-8") as f:
+                    with open(f"trace_{scenario}_maze{maze_id}.log", "a", encoding="utf-8") as f:
                         f.write(f"\n{'='*60}\n")
                         f.write(f"RUN START: scenario={scenario} maze={maze_id} run={run_number} model={model_config.model} ts={ts}\n")
                         f.write(f"{'='*60}\n")
@@ -100,7 +112,7 @@ async def run_experiments(
                         render_run_video(maze, result, videos_folder / gif_name)
 
                     if db:
-                        experiment_id = await db.save_run(result, maze_id)
+                        experiment_id = await db.save_run(result, maze_id, batch_id)
                         print(f"saved ({experiment_id[:8]}…)")
                     else:
                         print("saved locally")

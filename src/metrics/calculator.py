@@ -8,6 +8,53 @@ with _PRICES_PATH.open() as f:
     _PRICES: dict[str, dict] = json.load(f)
 
 
+def agent_cost_usd(model: str, agent: dict) -> float:
+    price     = _PRICES.get(model, {"input": 0.0, "output": 0.0})
+    price_in  = price["input"]
+    price_out = price["output"]
+    price_hit = price.get("cache_hit", price_in)
+
+    hit           = agent.get("cache_hit_tokens") or 0
+    miss          = agent.get("cache_miss_tokens") or 0
+    uncategorized = max(0, agent["prompt_tokens"] - hit - miss)
+
+    return (hit * price_hit + (miss + uncategorized) * price_in + agent["completion_tokens"] * price_out) / 1_000_000
+
+
+def build_run_summary_rows(result: dict) -> list[dict]:
+    """Per-agent + TOTAL rows in the same shape as the terminal's RUN
+    SUMMARY table (src/viz/terminal.py's show_summary). Shared so the CLI
+    view and the Streamlit Results page never drift apart. Reads the
+    optimality/redundancy ratios already computed and saved by
+    src/scenarios/runner.py rather than recomputing them, since the
+    Maze object isn't available when reading saved result JSON back.
+    """
+    model = result["model"]
+    rows = []
+    total_tokens = 0
+    total_cost = 0.0
+
+    for ag in result["agents"]:
+        cost = agent_cost_usd(model, ag)
+        total_tokens += ag["total_tokens"]
+        total_cost += cost
+        rows.append({
+            "Agent":   f"Agent {ag['agent_id']}",
+            "Steps":   ag.get("steps"),
+            "Optimal": ag.get("optimal_steps"),
+            "Ratio":   ag.get("optimality_ratio"),
+            "Redund.": ag.get("redundancy_ratio"),
+            "Tokens":  ag.get("total_tokens"),
+            "Cost":    cost,
+        })
+
+    rows.append({
+        "Agent": "TOTAL", "Steps": None, "Optimal": None, "Ratio": None, "Redund.": None,
+        "Tokens": total_tokens, "Cost": total_cost,
+    })
+    return rows
+
+
 class PathOptimalityRatio:
     def __init__(self, maze: Maze):
         self.maze = maze

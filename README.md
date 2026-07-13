@@ -43,8 +43,8 @@ Three maze difficulties are available:
 
 | Difficulty | Size | Maze ID |
 |---|---|---|
-| `easy` | 7×7 | 1 |
-| `medium` | 15×15 | 2 |
+| `easy` | 11×11 | 1 |
+| `medium` | 21×21 | 2 |
 | `hard` | 33×33 | 3 |
 
 ```bash

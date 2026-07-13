@@ -1,3 +1,5 @@
+import os
+import uuid
 from pathlib import Path
 import matplotlib
 matplotlib.use("Agg")
@@ -15,22 +17,58 @@ _EXIT_COLOR   = "#CC2222"
 _START_ALPHA  = 0.35
 
 
-def render_run_video(maze: Maze, result: dict, output_path: Path) -> None:
-    paths = {ag["agent_id"]: ag["path"] for ag in result["agents"]}
-    max_t = max(len(p) for p in paths.values())
-
+def _draw_maze_background(ax, maze: Maze) -> None:
     bg = np.full((maze.rows, maze.cols), _OPEN_COLOR)
     for y in range(maze.rows):
         for x in range(maze.cols):
             if maze.grid[y][x] == 1:
                 bg[y][x] = _WALL_COLOR
 
-    fig, ax = plt.subplots(figsize=(6, 6))
     ax.imshow(bg, cmap="gray", vmin=0, vmax=1, origin="upper", interpolation="nearest")
 
     ex, ey = maze.exit_pos
     ax.add_patch(plt.Rectangle((ex - 0.5, ey - 0.5), 1, 1, color=_EXIT_COLOR, zorder=2))
     ax.text(ex, ey, "E", ha="center", va="center", color="white", fontsize=8, fontweight="bold", zorder=3)
+
+    ax.set_xticks([])
+    ax.set_yticks([])
+    ax.set_xlim(-0.5, maze.cols - 0.5)
+    ax.set_ylim(maze.rows - 0.5, -0.5)
+
+
+def render_live_frame(maze: Maze, positions: dict, output_path: Path, title: str = "") -> None:
+    """Render a single PNG snapshot of the maze with agents at `positions`,
+    in the same visual style as the run GIF (render_run_video). Used to
+    drive a live-updating view (e.g. in Streamlit) while a run is in
+    progress, since raw terminal ANSI art doesn't render outside a tty.
+    """
+    fig, ax = plt.subplots(figsize=(5, 5))
+    _draw_maze_background(ax, maze)
+
+    for aid, color in _AGENT_COLORS.items():
+        if aid in positions:
+            x, y = positions[aid]
+            ax.plot(x, y, "o", color=color, markersize=9, zorder=4,
+                    markeredgecolor="black", markeredgewidth=0.5)
+
+    if title:
+        ax.set_title(title, fontsize=9)
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    # Unique per call so concurrent writers (e.g. an overlapping run from a
+    # previous subprocess) never race on the same tmp filename.
+    tmp_path = output_path.with_suffix(f".{os.getpid()}.{uuid.uuid4().hex}.tmp")
+    fig.savefig(str(tmp_path), dpi=100, bbox_inches="tight", format="png")
+    plt.close(fig)
+    tmp_path.replace(output_path)  # atomic swap so readers never see a partial write
+
+
+def render_run_video(maze: Maze, result: dict, output_path: Path) -> None:
+    paths = {ag["agent_id"]: ag["path"] for ag in result["agents"]}
+    max_t = max(len(p) for p in paths.values())
+
+    fig, ax = plt.subplots(figsize=(6, 6))
+    _draw_maze_background(ax, maze)
 
     for i, sp in enumerate(maze.start_positions):
         sx, sy = sp
@@ -52,11 +90,6 @@ def render_run_video(maze: Maze, result: dict, output_path: Path) -> None:
     maze_id   = result.get("maze_id", "")
     run_num   = result.get("run_number", "")
     title_obj = ax.set_title(f"{scenario} | maze {maze_id} | run {run_num} | t=0", fontsize=9)
-
-    ax.set_xticks([])
-    ax.set_yticks([])
-    ax.set_xlim(-0.5, maze.cols - 0.5)
-    ax.set_ylim(maze.rows - 0.5, -0.5)
 
     def update(t):
         for aid, dot in dots.items():

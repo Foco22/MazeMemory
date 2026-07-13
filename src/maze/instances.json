@@ -1,5 +1,5 @@
 {
-  "1": {"seed": 42,   "rows": 7,  "cols": 7,  "difficulty": "easy"},
-  "2": {"seed": 42,   "rows": 15, "cols": 15, "difficulty": "medium"},
+  "1": {"seed": 42,   "rows": 11, "cols": 11, "difficulty": "easy"},
+  "2": {"seed": 42,   "rows": 21, "cols": 21, "difficulty": "medium"},
   "3": {"seed": 2024, "rows": 33, "cols": 33, "difficulty": "hard"}
 }

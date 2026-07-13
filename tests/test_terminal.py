@@ -40,7 +40,8 @@ def make_run_result(maze, agents_override=None):
 
 @pytest.fixture
 def view(maze):
-    with patch("src.viz.terminal._enter_alt_screen"), \
+    with patch("src.viz.terminal._is_tty", return_value=True), \
+         patch("src.viz.terminal._enter_alt_screen"), \
          patch("src.viz.terminal.atexit.register"):
         yield LiveMazeView(maze, model="gpt-4o-mini")
 
@@ -128,3 +129,57 @@ class TestShowSummary:
              patch("src.viz.terminal.atexit.unregister"):
             view.show_summary(result)
         mock_exit.assert_called_once()
+
+
+class TestNonTtyOutput:
+    """When stdout is piped (e.g. Streamlit's subprocess), no raw ANSI
+    escape codes should be written — they'd show up as garbage text instead
+    of being interpreted, since there's no real terminal to interpret them.
+    """
+
+    @pytest.fixture
+    def piped_view(self, maze, tmp_path):
+        with patch("src.viz.terminal._is_tty", return_value=False):
+            yield LiveMazeView(maze, model="gpt-4o-mini", frame_path=tmp_path / "frame.png")
+
+    def test_does_not_enter_alt_screen(self, maze):
+        with patch("src.viz.terminal._is_tty", return_value=False), \
+             patch("src.viz.terminal._enter_alt_screen") as mock_enter:
+            LiveMazeView(maze, model="gpt-4o-mini")
+        mock_enter.assert_not_called()
+
+    def test_render_has_no_escape_codes(self, piped_view, maze, capsys):
+        x, y = maze.start_positions[0]
+        import asyncio
+        asyncio.run(piped_view.update("1", (x, y), timestep=0))
+        out = capsys.readouterr().out
+        assert "\033" not in out
+        assert "█" not in out, "ASCII maze grid should not be printed when piped"
+
+    def test_render_writes_png_frame_instead_of_ascii(self, piped_view, maze):
+        x, y = maze.start_positions[0]
+        import asyncio
+        asyncio.run(piped_view.update("1", (x, y), timestep=0))
+        assert piped_view.frame_path.exists()
+        assert piped_view.frame_path.read_bytes()[:8] == b"\x89PNG\r\n\x1a\n"
+
+    def test_frame_write_failure_does_not_crash_the_run(self, piped_view, maze):
+        # A transient OSError writing the live-view PNG (e.g. a race with a
+        # stale writer on the same tmp path) must not abort the agent run —
+        # this is a best-effort visualization, not a correctness requirement.
+        x, y = maze.start_positions[0]
+        import asyncio
+        with patch("src.viz.terminal.render_live_frame", side_effect=OSError("No such file or directory")):
+            asyncio.run(piped_view.update("1", (x, y), timestep=0))  # should not raise
+
+    def test_show_summary_is_a_no_op(self, piped_view, maze, capsys):
+        # The RUN SUMMARY table is shown in Streamlit's Results section
+        # instead — printing it here too would just duplicate it in the log.
+        result = make_run_result(maze)
+        with patch("src.viz.terminal._exit_alt_screen") as mock_exit, \
+             patch("src.viz.terminal.atexit.unregister") as mock_unregister:
+            piped_view.show_summary(result)
+        out = capsys.readouterr().out
+        assert out == ""
+        mock_exit.assert_not_called()
+        mock_unregister.assert_not_called()

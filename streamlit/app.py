@@ -1,5 +1,6 @@
 import sys
 import json
+import re
 import subprocess
 from pathlib import Path
 
@@ -12,9 +13,13 @@ ROOT        = Path(__file__).parent.parent   # MazeMemory/
 RESULTS_DIR = ROOT / "results" / "experiments"
 VIDEOS_DIR  = ROOT / "results" / "videos"
 RUN_SCRIPT  = ROOT / "experiments" / "run.py"
+LIVE_FRAME  = ROOT / "results" / "live" / "frame.png"   # must match src/viz/terminal.py's default
+
+sys.path.insert(0, str(ROOT))
+from src.metrics.calculator import build_run_summary_rows
 
 DIFFICULTY_TO_MAZE = {"easy": 1, "medium": 2, "hard": 3}
-MAZE_LABELS = {"easy": "Easy (7×7)", "medium": "Medium (15×15)", "hard": "Hard (33×33)"}
+MAZE_LABELS = {"easy": "Easy (11×11)", "medium": "Medium (21×21)", "hard": "Hard (33×33)"}
 SCENARIOS   = ["baseline", "shared_memory", "observer", "shared_memory_observer"]
 
 MODELS = {
@@ -73,6 +78,10 @@ run_btn = st.button("▶  Run Experiment", type="primary", use_container_width=T
 # STEP 2 — Execute & stream logs
 # ─────────────────────────────────────────────────────────────────────────────
 if run_btn:
+    maze_id       = DIFFICULTY_TO_MAZE[difficulty]
+    result_glob   = f"{scenario}_maze{maze_id}_*.json"
+    files_before  = set(RESULTS_DIR.glob(result_glob))  # to isolate this run's own output later
+
     cmd = [
         sys.executable, str(RUN_SCRIPT),
         "--model",      selected_model,
@@ -89,8 +98,22 @@ if run_btn:
         cmd.append("--no-db")
 
     st.header("Step 2 — Running…")
-    log_box = st.empty()
-    gif_slot = st.empty()
+
+    run_indicator = st.empty()
+    run_indicator.info(f"Waiting to start run 1 of {n_runs}…")
+    # run.py prints "[<completed>/<total>] scenario | maze=N | run=<run_number> ... "
+    # once at the start of each run — parse it to know which run is in progress.
+    run_label_re = re.compile(r'^\[\d+/\d+\]\s+\S+\s+\|\s+maze=\d+\s+\|\s+run=(\d+)')
+
+    if live:
+        LIVE_FRAME.unlink(missing_ok=True)  # drop any stale frame from a previous run
+        maze_col, log_col = st.columns([1, 1])
+        maze_slot = maze_col.empty()
+        log_box = log_col.empty()
+    else:
+        log_box = st.empty()
+        maze_slot = None
+
     lines: list[str] = []
 
     with subprocess.Popen(
@@ -104,6 +127,11 @@ if run_btn:
         for line in proc.stdout:
             lines.append(line)
             log_box.code("".join(lines[-40:]), language=None)
+            if maze_slot is not None and LIVE_FRAME.exists():
+                maze_slot.image(str(LIVE_FRAME), caption="Live maze view", use_container_width=True)
+            match = run_label_re.match(line)
+            if match:
+                run_indicator.info(f"▶ Run {match.group(1)} of {n_runs}")
         proc.wait()
         exit_ok = proc.returncode == 0
 
@@ -112,27 +140,37 @@ if run_btn:
     else:
         st.error("❌ Experiment failed — check the logs above.")
 
-    # Show latest GIF if video was generated
+    # ─────────────────────────────────────────────────────────────────────────
+    # STEP 3 — Video Replay
+    # ─────────────────────────────────────────────────────────────────────────
+    st.header("Step 3 — Video Replay")
+    gifs = []
     if save_video and VIDEOS_DIR.exists():
-        gifs = sorted(VIDEOS_DIR.rglob(f"{scenario}_maze{DIFFICULTY_TO_MAZE[difficulty]}_*.gif"))
-        if gifs:
-            gif_slot.image(str(gifs[-1]), caption="Latest run — GIF replay")
+        gifs = sorted(VIDEOS_DIR.rglob(f"{scenario}_maze{maze_id}_*.gif"))
+    if gifs:
+        st.image(str(gifs[-1]), caption="Latest run — GIF replay")
+    else:
+        st.info("No video was generated for this run. Check \"Generate GIF video\" in Step 1 to see a replay here.")
 
     # ─────────────────────────────────────────────────────────────────────────
-    # STEP 3 — Results
+    # STEP 4 — Results
     # ─────────────────────────────────────────────────────────────────────────
     if exit_ok and RESULTS_DIR.exists():
-        st.header("Step 3 — Results")
+        st.header("Step 4 — Results")
 
-        maze_id = DIFFICULTY_TO_MAZE[difficulty]
-        files   = sorted(RESULTS_DIR.glob(f"{scenario}_maze{maze_id}_*.json"))
+        # Everything in Step 4 is scoped to the run(s) just executed by this
+        # button click, not the whole saved history for this scenario+maze
+        # (which would mix in unrelated past sessions, or even past maze
+        # layouts if the maze config changed since those were saved).
+        new_files = sorted(set(RESULTS_DIR.glob(result_glob)) - files_before)
 
-        if not files:
-            st.info("No result files found yet for this combination.")
+        if not new_files:
+            st.info("No new result files were produced by this run.")
         else:
+            new_results = [json.loads(f.read_text()) for f in new_files]
+
             rows = []
-            for f in files:
-                data = json.loads(f.read_text())
+            for data in new_results:
                 for agent in data.get("agents", []):
                     rows.append({
                         "run":               data.get("run_number"),
@@ -147,18 +185,35 @@ if run_btn:
 
             df = pd.DataFrame(rows)
 
-            # Summary table
-            st.subheader("Run summary")
-            st.dataframe(
-                df.style.format({
-                    "optimality_ratio": "{:.3f}",
-                    "redundancy_ratio": "{:.3f}",
-                }, na_rep="—"),
-                use_container_width=True,
-            )
+            # Per-run summary tables — same shape as the terminal's RUN SUMMARY
+            # (Agent | Steps | Optimal | Ratio | Redund. | Tokens | Cost + TOTAL row).
+            st.subheader("Run summaries (this run)")
+            for result in new_results:
+                summary_df = pd.DataFrame(build_run_summary_rows(result))
+                with st.expander(
+                    f"Run {result.get('run_number')} — {result.get('scenario')} maze {result.get('maze_id')}",
+                    expanded=(result is new_results[-1]),
+                ):
+                    st.dataframe(
+                        summary_df.style.format({
+                            "Ratio":   "{:.2f}",
+                            "Redund.": "{:.2f}",
+                            "Cost":    "${:.5f}",
+                        }, na_rep="—"),
+                        use_container_width=True,
+                        hide_index=True,
+                    )
 
             # Charts — 3 metrics
-            st.subheader("Metric charts (all saved runs for this scenario + difficulty)")
+            st.subheader("Metric charts (this run)")
+            MIN_RUNS_FOR_DISTRIBUTION = 5
+            if len(new_files) < MIN_RUNS_FOR_DISTRIBUTION:
+                st.info(
+                    f"Only {len(new_files)} run(s) in this execution — "
+                    f"box plots need several runs to show a meaningful spread (quartiles/whiskers). "
+                    f"Individual data points are shown below; use {MIN_RUNS_FOR_DISTRIBUTION}+ runs "
+                    f"(see \"Number of runs\" in Step 1) for the box shape to become meaningful."
+                )
             c1, c2, c3 = st.columns(3)
 
             with c1:
@@ -166,6 +221,7 @@ if run_btn:
                     df.dropna(subset=["optimality_ratio"]),
                     y="optimality_ratio",
                     color="agent",
+                    points="all",
                     title="Path Optimality Ratio",
                     labels={"optimality_ratio": "ratio (lower = better)"},
                 )
@@ -178,6 +234,7 @@ if run_btn:
                     df.dropna(subset=["tokens"]),
                     y="tokens",
                     color="agent",
+                    points="all",
                     title="Token Consumption",
                     labels={"tokens": "tokens (lower = cheaper)"},
                 )
@@ -188,6 +245,7 @@ if run_btn:
                     df.dropna(subset=["redundancy_ratio"]),
                     y="redundancy_ratio",
                     color="agent",
+                    points="all",
                     title="Redundant Computation Ratio",
                     labels={"redundancy_ratio": "ratio (lower = better)"},
                 )

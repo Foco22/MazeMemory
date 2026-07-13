@@ -4,11 +4,14 @@ import json
 import sys
 from pathlib import Path
 from src.maze.generator import Maze
-from src.metrics.calculator import PathOptimalityRatio, TokenConsumption, RedundantComputationReduction
+from src.metrics.calculator import PathOptimalityRatio, TokenConsumption, RedundantComputationReduction, agent_cost_usd
+from src.viz.video import render_live_frame
 
 _PRICES_PATH = Path(__file__).parent.parent / "metrics" / "prices.json"
 with _PRICES_PATH.open() as _f:
     _PRICES: dict[str, dict] = json.load(_f)
+
+_DEFAULT_FRAME_PATH = Path(__file__).parent.parent.parent / "results" / "live" / "frame.png"
 
 COLORS = {
     "1": "\033[93m",   # yellow
@@ -35,12 +38,17 @@ def _exit_alt_screen() -> None:
     sys.stdout.flush()
 
 
+def _is_tty() -> bool:
+    return sys.stdout.isatty()
+
+
 class LiveMazeView:
     AGENT_IDS = ["1", "2", "3"]
 
-    def __init__(self, maze: Maze, model: str = ""):
+    def __init__(self, maze: Maze, model: str = "", frame_path: Path | None = None):
         self.maze = maze
         self.model = model
+        self.frame_path = frame_path or _DEFAULT_FRAME_PATH
         self.positions: dict[str, tuple[int, int]] = {}
         self.steps: dict[str, int] = {}
         self.prompt_tokens: dict[str, int] = {}
@@ -49,8 +57,10 @@ class LiveMazeView:
         self.last_prompt: dict[str, int] = {}
         self.last_completion: dict[str, int] = {}
         self._lock = asyncio.Lock()
-        _enter_alt_screen()
-        atexit.register(_exit_alt_screen)
+        self._tty = _is_tty()
+        if self._tty:
+            _enter_alt_screen()
+            atexit.register(_exit_alt_screen)
 
     async def update(self, agent_id: str, position: tuple[int, int], timestep: int,
                      prompt_tokens: int = 0, completion_tokens: int = 0, context_messages: int = 0,
@@ -75,49 +85,71 @@ class LiveMazeView:
             self._render()
 
     def _render(self) -> None:
-        CLR = "\033[K"
+        # Cursor/screen control and color codes only make sense on a real
+        # terminal. When stdout is piped (e.g. Streamlit's subprocess), they
+        # show up as literal garbage text instead of doing anything. In that
+        # case, render the maze as a PNG (same style as the run GIF) instead
+        # of ASCII art, and let the caller display that image file directly.
+        tty   = self._tty
+        clr   = "\033[K" if tty else ""
+        reset = RESET if tty else ""
+        bold  = BOLD  if tty else ""
 
-        sys.stdout.write("\033[H\033[J")  # home + clear to end (safe inside alt screen)
-        sys.stdout.flush()
+        if tty:
+            sys.stdout.write("\033[H\033[J")  # home + clear to end (safe inside alt screen)
+            sys.stdout.flush()
 
-        pos_to_agent = {pos: aid for aid, pos in self.positions.items()}
-
-        for y in range(self.maze.rows):
-            row = ""
-            for x in range(self.maze.cols):
-                pos = (x, y)
-                if pos == self.maze.exit_pos:
-                    row += f"{RED}E{RESET}"
-                elif pos in pos_to_agent:
-                    aid = pos_to_agent[pos]
-                    row += f"{COLORS.get(aid, '')}{aid}{RESET}"
-                elif self.maze.grid[y][x] == 1:
-                    row += "█"
-                else:
-                    row += " "
-            print(row + CLR)
-
-        print(CLR)
+            pos_to_agent = {pos: aid for aid, pos in self.positions.items()}
+            for y in range(self.maze.rows):
+                row = ""
+                for x in range(self.maze.cols):
+                    pos = (x, y)
+                    if pos == self.maze.exit_pos:
+                        row += f"{RED}E{reset}"
+                    elif pos in pos_to_agent:
+                        aid = pos_to_agent[pos]
+                        row += f"{COLORS.get(aid, '')}{aid}{reset}"
+                    elif self.maze.grid[y][x] == 1:
+                        row += "█"
+                    else:
+                        row += " "
+                print(row + clr)
+            print(clr)
+        else:
+            step = max(self.steps.values(), default=0)
+            try:
+                render_live_frame(self.maze, self.positions, self.frame_path, title=f"t={step}")
+            except OSError:
+                # This is a best-effort visualization aid — a transient
+                # write failure (e.g. a stale writer racing on the same
+                # frame file) must never abort the actual experiment run.
+                pass
 
         total_prompt = 0
         total_completion = 0
         for aid in self.AGENT_IDS:
-            color = COLORS.get(aid, "")
+            color = COLORS.get(aid, "") if tty else ""
             pos = self.positions.get(aid, "-")
             steps = self.steps.get(aid, 0)
             pt = self.prompt_tokens.get(aid, 0)
             ct = self.completion_tokens.get(aid, 0)
-            msgs = self.context_messages.get(aid, 0)
             cost = _cost(self.model, pt, ct)
             total_prompt += pt
             total_completion += ct
-            print(f"  {color}Agent {aid}{RESET}  pos={pos}  steps={steps}  prompt={pt}  completion={ct}  cost=${cost:.5f}{CLR}")
+            print(f"  {color}Agent {aid}{reset}  pos={pos}  steps={steps}  prompt={pt}  completion={ct}  cost=${cost:.5f}{clr}")
 
-        print(CLR)
+        print(clr)
         total_cost = _cost(self.model, total_prompt, total_completion)
-        print(f"  {BOLD}TOTAL{RESET}  prompt={total_prompt}  completion={total_completion}  cost=${total_cost:.5f}{CLR}")
+        print(f"  {bold}TOTAL{reset}  prompt={total_prompt}  completion={total_completion}  cost=${total_cost:.5f}{clr}")
 
     def show_summary(self, result: dict) -> None:
+        if not self._tty:
+            # This table is redundant with Streamlit's Results section
+            # (which shows the same per-agent breakdown, cost included, once
+            # the run finishes), and it doesn't render cleanly when piped
+            # through a subprocess anyway — so skip it entirely there.
+            return
+
         _exit_alt_screen()
         atexit.unregister(_exit_alt_screen)
 
@@ -134,9 +166,6 @@ class LiveMazeView:
         print(f"  {'Agent':<8} {'Steps':>6} {'Optimal':>8} {'Ratio':>7} {'Redund.':>8} {'Tokens':>8} {'Cost':>10}")
         print("  " + "·" * 67)
 
-        price    = _PRICES.get(result["model"], {"input": 0.0, "output": 0.0})
-        price_hit = price.get("cache_hit", price["input"])
-
         for ag in result["agents"]:
             aid   = ag["agent_id"]
             color = COLORS.get(aid, "")
@@ -144,10 +173,7 @@ class LiveMazeView:
             redu  = redu_by_id.get(aid, {})
             ratio = f"{opt['ratio']:.2f}"   if opt["ratio"]        is not None else "N/A"
             redun = f"{redu['ratio']:.2f}"  if redu.get("ratio")   is not None else "N/A"
-            hit          = ag.get("cache_hit_tokens") or 0
-            miss         = ag.get("cache_miss_tokens") or 0
-            uncategorized = max(0, ag["prompt_tokens"] - hit - miss)
-            agent_cost   = (hit * price_hit + (miss + uncategorized) * price["input"] + ag["completion_tokens"] * price["output"]) / 1_000_000
+            agent_cost = agent_cost_usd(result["model"], ag)
             print(f"  {color}Agent {aid}{RESET}   "
                   f"{ag['steps']:>6}  "
                   f"{opt['optimal_steps'] or 'N/A':>7}  "

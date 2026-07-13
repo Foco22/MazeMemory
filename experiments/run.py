@@ -16,7 +16,7 @@ logging.getLogger("LiteLLM Router").setLevel(logging.ERROR)
 import litellm
 litellm.suppress_debug_info = True
 
-from src.maze.instances import get_maze, available_maze_ids
+from src.maze.instances import get_maze, available_maze_ids, maze_id_by_difficulty
 from src.scenarios.runner import run_scenario, SCENARIOS
 from src.scenarios.config import ModelConfig
 from src.db.client import SupabaseClient
@@ -135,7 +135,8 @@ def parse_args():
     parser.add_argument("--api-base", default=None,                 help="Custom API base URL (e.g. for Ollama: http://localhost:11434/v1)")
     parser.add_argument("--api-key",  default=None,                 help="Custom API key (use 'ollama' for local Ollama)")
     parser.add_argument("--scenarios", nargs="+", default=list(SCENARIOS), choices=list(SCENARIOS))
-    parser.add_argument("--mazes",    nargs="+", type=int, default=None)
+    parser.add_argument("--mazes",      nargs="+", type=int, default=None, help="Maze IDs (e.g. 1 2 3)")
+    parser.add_argument("--difficulty", nargs="+", choices=["easy", "medium", "hard"], default=None, help="Maze difficulty (easy/medium/hard). Overrides --mazes.")
     parser.add_argument("--n-runs",   type=int, default=20)
     parser.add_argument("--lookahead", type=int, default=3)
     parser.add_argument("--no-db",    action="store_true", help="Skip Supabase, save locally only")
@@ -160,6 +161,11 @@ if __name__ == "__main__":
         api_base=args.api_base,
         api_key=args.api_key,
     )
+    if args.difficulty:
+        maze_ids = [maze_id_by_difficulty(d) for d in args.difficulty]
+    else:
+        maze_ids = args.mazes
+
     loop = asyncio.new_event_loop()
     loop.set_exception_handler(_silence_ssl_shutdown)
     asyncio.set_event_loop(loop)
@@ -167,7 +173,7 @@ if __name__ == "__main__":
         loop.run_until_complete(run_experiments(
             model_config=model_config,
             scenarios=args.scenarios,
-            maze_ids=args.mazes,
+            maze_ids=maze_ids,
             n_runs=args.n_runs,
             lookahead=args.lookahead,
             save_to_db=not args.no_db,

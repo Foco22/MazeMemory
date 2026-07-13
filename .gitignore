@@ -1,5 +1,6 @@
 .env
 CLAUDE.md
+MazeMemory.md
 __pycache__/
 *.pyc
 .venv/

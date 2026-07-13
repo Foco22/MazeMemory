@@ -31,12 +31,23 @@ cp .env.example .env  # add your API keys
 
 ## Running experiments
 
+Three maze difficulties are available:
+
+| Difficulty | Size | Maze ID |
+|---|---|---|
+| `easy` | 7×7 | 1 |
+| `medium` | 15×15 | 2 |
+| `hard` | 33×33 | 3 |
+
 ```bash
-# Full experiment (180 runs: 3 scenarios × 3 mazes × 20 runs)
-python experiments/run.py
+# Full experiment (360 runs: 4 scenarios × 3 difficulties × 30 runs)
+python experiments/run.py --model deepseek/deepseek-v4-flash --provider deepseek --difficulty easy medium hard --n-runs 30
+
+# Single difficulty by name
+python experiments/run.py --difficulty easy --scenarios baseline --n-runs 5 --no-db --no-video
 
 # Single test run with live visualization
-python experiments/run.py --scenarios baseline --mazes 1 --n-runs 10 --model gpt-4o --provider openai --live --no-db
+python experiments/run.py --difficulty easy --scenarios baseline --n-runs 1 --model deepseek/deepseek-v4-flash --provider deepseek --live --no-db
 
 # DeepSeek V4 Flash (cheap, requires DEEPSEEK_API_KEY in .env)
 python -u experiments/run.py --scenarios shared_memory_observer --mazes 1 --n-runs 30 --model deepseek/deepseek-chat --provider deepseek --live --no-db

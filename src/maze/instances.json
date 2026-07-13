@@ -1,7 +1,5 @@
 {
-  "0": {"seed": 42,   "rows": 5, "cols": 5},
-  "1": {"seed": 42,   "rows": 15, "cols": 15},
-  "2": {"seed": 137,  "rows": 15, "cols": 15},
-  "3": {"seed": 2024, "rows": 15, "cols": 15},
-  "4": {"seed": 2024, "rows": 33, "cols": 33}
+  "1": {"seed": 42,   "rows": 7,  "cols": 7,  "difficulty": "easy"},
+  "2": {"seed": 42,   "rows": 15, "cols": 15, "difficulty": "medium"},
+  "3": {"seed": 2024, "rows": 33, "cols": 33, "difficulty": "hard"}
 }

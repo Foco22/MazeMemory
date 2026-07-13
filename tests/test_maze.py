@@ -1,7 +1,7 @@
 import pytest
 from src.maze.generator import generate_maze
 from src.maze.pathfinding import astar, optimal_steps
-from src.maze.instances import get_maze, available_maze_ids
+from src.maze.instances import get_maze, available_maze_ids, maze_id_by_difficulty
 
 
 def test_maze_generation_is_deterministic():
@@ -55,3 +55,21 @@ def test_all_maze_instances_load():
         maze = get_maze(maze_id)
         assert maze.grid is not None
         assert maze.exit_pos is not None
+
+
+def test_maze_id_by_difficulty_returns_correct_ids():
+    assert maze_id_by_difficulty("easy") == 1
+    assert maze_id_by_difficulty("medium") == 2
+    assert maze_id_by_difficulty("hard") == 3
+
+
+def test_maze_id_by_difficulty_invalid_raises():
+    with pytest.raises(ValueError):
+        maze_id_by_difficulty("impossible")
+
+
+def test_difficulty_mazes_have_increasing_size():
+    easy   = get_maze(maze_id_by_difficulty("easy"))
+    medium = get_maze(maze_id_by_difficulty("medium"))
+    hard   = get_maze(maze_id_by_difficulty("hard"))
+    assert len(easy.grid) < len(medium.grid) < len(hard.grid)

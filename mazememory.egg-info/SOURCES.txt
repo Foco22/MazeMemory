@@ -11,6 +11,7 @@ src/agents/context.py
 src/agents/navigator.py
 src/agents/observer.py
 src/agents/prompts.py
+src/agents/rate_limiter.py
 src/agents/tools.py
 src/db/__init__.py
 src/db/client.py

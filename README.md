@@ -29,6 +29,14 @@ cp .env.example .env  # add your API keys
 > ```
 > Without it, Python won't find the `src` package and will throw `ModuleNotFoundError: No module named 'src'`.
 
+## Streamlit app
+
+```bash
+streamlit run streamlit/app.py
+```
+
+Opens a browser UI to configure and run experiments, stream live logs, and view results and charts automatically after each run.
+
 ## Running experiments
 
 Three maze difficulties are available:

@@ -60,7 +60,6 @@ ID: 4fd05ceb-37a5-4065-88c5-89a8e30d69d9
 python experiments/run.py --model deepseek/deepseek-v4-flash --provider deepseek --scenarios observer --difficulty hard --n-runs 30 --live
 ID; a3ccc94b-d925-4b70-9701-c9037cd4828b
 
-
 python experiments/run.py --model deepseek/deepseek-v4-flash --provider deepseek --scenarios shared_memory_observer --difficulty easy --n-runs 30 --live
 ID: ed8e4e86-42e8-4229-959e-4d12684bf17d
 
@@ -70,8 +69,6 @@ ID: c0869925-9952-4685-b965-48dc3ad4f297
 python experiments/run.py --model deepseek/deepseek-v4-flash --provider deepseek --scenarios shared_memory_observer --difficulty hard --n-runs 30 --live
 ID: 7d0dddad-f60b-4d44-acea-0416831ffc6c
 ```
-
-
 
 Con `--live` ves el laberinto y las posiciones de los 3 agentes actualizándose en tiempo
 real en la terminal, además del resumen (`RUN SUMMARY`) al terminar cada run. Corre cada

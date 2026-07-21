@@ -40,16 +40,16 @@ source .venv/bin/activate
 
 ```bash
 python experiments/run.py --model deepseek/deepseek-v4-flash --provider deepseek --scenarios baseline --difficulty easy --n-runs 30 --live
-ID: <pegar aquí el batch_id que imprime al terminar>
+ID: cd2a33b8-9992-49ba-9b82-c56c58a60edf
 
 python experiments/run.py --model deepseek/deepseek-v4-flash --provider deepseek --scenarios shared_memory --difficulty easy --n-runs 30 --live
-ID: <pegar aquí el batch_id que imprime al terminar>
+ID: 9592be0d-2c97-4536-8130-7b50a195da77
 
 python experiments/run.py --model deepseek/deepseek-v4-flash --provider deepseek --scenarios observer --difficulty easy --n-runs 30 --live
-ID: <pegar aquí el batch_id que imprime al terminar>
+ID:  ffda230f-e5b3-45e9-bc27-2076490212e6
 
 python experiments/run.py --model deepseek/deepseek-v4-flash --provider deepseek --scenarios shared_memory_observer --difficulty easy --n-runs 30 --live
-ID: <pegar aquí el batch_id que imprime al terminar>
+ID: b49816ab-948a-4e4e-a5f4-39b25ee50eff
 ```
 
 Corre cada comando uno a la vez. Al terminar cada uno, el sistema imprime el `batch_id`

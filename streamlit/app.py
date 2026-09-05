@@ -1,3 +1,4 @@
+import os
 import sys
 import json
 import re
@@ -7,6 +8,7 @@ from pathlib import Path
 import pandas as pd
 import plotly.express as px
 import streamlit as st
+from dotenv import load_dotenv
 
 # ── Paths ────────────────────────────────────────────────────────────────────
 ROOT        = Path(__file__).parent.parent   # MazeMemory/
@@ -17,6 +19,39 @@ LIVE_FRAME  = ROOT / "results" / "live" / "frame.png"   # must match src/viz/ter
 
 sys.path.insert(0, str(ROOT))
 from src.metrics.calculator import build_run_summary_rows
+
+load_dotenv(ROOT / ".env")
+
+
+def supabase_configured() -> bool:
+    """True only if .env holds real Supabase credentials.
+
+    Without this check the run crashes deep inside the supabase client
+    (`SupabaseException: Invalid URL`) whenever the placeholder values from
+    .env.example are still in place, so the DB option is disabled instead.
+    """
+    url = os.environ.get("SUPABASE_URL", "").strip()
+    key = os.environ.get("SUPABASE_KEY", "").strip()
+    return url.startswith(("http://", "https://")) and bool(key) and not key.startswith("your_")
+
+
+SUPABASE_READY = supabase_configured()
+
+
+def show_live_frame(slot, path: Path) -> None:
+    """Best-effort render of the maze frame run.py keeps overwriting.
+
+    The writer swaps the PNG atomically, so a reader never sees half an
+    image — but on Windows a read landing exactly on the swap raises
+    instead of returning the previous bytes. Reading the bytes here (rather
+    than handing Streamlit the path) keeps that failure to a single OSError:
+    skip the frame and leave the last one on screen.
+    """
+    try:
+        data = path.read_bytes()
+    except OSError:
+        return
+    slot.image(data, caption="Live maze view", use_container_width=True)
 
 DIFFICULTY_TO_MAZE = {"easy": 1, "medium": 2, "hard": 3}
 MAZE_LABELS = {"easy": "Easy (11×11)", "medium": "Medium (21×21)", "hard": "Hard (33×33)"}
@@ -70,7 +105,17 @@ with col_a:
 with col_b:
     save_video = st.checkbox("Generate GIF video after run", value=False)
 with col_c:
-    save_db    = st.checkbox("Save results to Supabase", value=True)
+    save_db    = st.checkbox(
+        "Save results to Supabase",
+        value=SUPABASE_READY,
+        disabled=not SUPABASE_READY,
+        help="Runs are always written to results/ first; this only adds the upload to Supabase.",
+    )
+    st.caption(
+        "Results saved to `results/`"
+        if SUPABASE_READY
+        else "Supabase not configured (set SUPABASE_URL / SUPABASE_KEY in .env) — saving locally to `results/`"
+    )
 
 run_btn = st.button("▶  Run Experiment", type="primary", use_container_width=True)
 
@@ -127,8 +172,8 @@ if run_btn:
         for line in proc.stdout:
             lines.append(line)
             log_box.code("".join(lines[-40:]), language=None)
-            if maze_slot is not None and LIVE_FRAME.exists():
-                maze_slot.image(str(LIVE_FRAME), caption="Live maze view", use_container_width=True)
+            if maze_slot is not None:
+                show_live_frame(maze_slot, LIVE_FRAME)
             match = run_label_re.match(line)
             if match:
                 run_indicator.info(f"▶ Run {match.group(1)} of {n_runs}")

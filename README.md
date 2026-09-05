@@ -18,18 +18,34 @@ Four scenarios are compared in a 2×2 factorial design:
 
 ```bash
 python -m venv .venv
+
+# macOS / Linux
 source .venv/bin/activate
-pip install -e .
+# Windows (PowerShell)
+.venv\Scripts\Activate.ps1
+
+pip install -e ".[app,dev]"
 cp .env.example .env  # add your API keys
 ```
 
+Extras:
+
+| Install | Includes |
+|---|---|
+| `pip install -e .` | experiments only (`experiments/run.py`, `experiments/sync.py`) |
+| `pip install -e ".[app]"` | + Streamlit UI (`streamlit`, `plotly`) |
+| `pip install -e ".[dev]"` | + tests (`pytest`, `pytest-asyncio`) |
+
 > **Note:** always activate the virtual environment before running any command:
 > ```bash
-> source .venv/bin/activate
+> source .venv/bin/activate      # macOS / Linux
+> .venv\Scripts\Activate.ps1     # Windows (PowerShell)
 > ```
 > Without it, Python won't find the `src` package and will throw `ModuleNotFoundError: No module named 'src'`.
 
 ## Streamlit app
+
+Requires the `app` extra (`pip install -e ".[app]"`).
 
 ```bash
 streamlit run streamlit/app.py
@@ -162,6 +178,8 @@ python experiments/sync.py
 Runs already in the database are skipped automatically.
 
 ## Running tests
+
+Requires the `dev` extra (`pip install -e ".[dev]"`).
 
 ```bash
 pytest

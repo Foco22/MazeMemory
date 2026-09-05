@@ -14,6 +14,9 @@ Requires-Dist: seaborn>=0.13.2
 Requires-Dist: scipy>=1.15.3
 Requires-Dist: statsmodels>=0.14.6
 Requires-Dist: tabulate>=0.10.0
+Provides-Extra: app
+Requires-Dist: streamlit>=1.35.0; extra == "app"
+Requires-Dist: plotly>=5.20.0; extra == "app"
 Provides-Extra: dev
 Requires-Dist: pytest>=8.0.0; extra == "dev"
 Requires-Dist: pytest-asyncio>=0.23.0; extra == "dev"

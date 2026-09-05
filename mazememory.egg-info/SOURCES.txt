@@ -29,6 +29,7 @@ src/scenarios/runner.py
 src/viz/__init__.py
 src/viz/terminal.py
 src/viz/video.py
+tests/test_calculator.py
 tests/test_context.py
 tests/test_db_client.py
 tests/test_maze.py
